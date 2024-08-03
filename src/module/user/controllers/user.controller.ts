@@ -3,6 +3,7 @@ import {
   ApiBadRequestResponse,
   ApiBody,
   ApiCreatedResponse,
+  ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
 import { CreateUserDto } from '../dtos';
@@ -15,6 +16,7 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post('register')
+  @ApiOperation({ summary: 'Register as a user to have access to the endpoints' })
   @ApiCreatedResponse({
     description: 'User registered succesfully',
     type: CreatedUserResponseData,

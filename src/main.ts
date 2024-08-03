@@ -17,7 +17,7 @@ async function bootstrap() {
 
   app.useGlobalPipes(
     new ValidationPipe({
-      whitelist: true, // THIS GETS RID OF ANY DATA NOT SPECIFIED IN THE DTO
+      whitelist: true,
       forbidNonWhitelisted: true,
       transform: true,
       transformOptions: {
@@ -43,14 +43,13 @@ async function bootstrap() {
   });
 
   const configuration = new DocumentBuilder()
-    .setTitle('Global Country Insights v1')
-    .setDescription('GLOBAL COUNTRY INSIGHTS')
+    .setTitle('Country API')
+    .setDescription('COUNTRY API')
     .setVersion('1.0')
     .addBearerAuth(
       { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },
       'JWT',
     )
-    .addTag('GLOBAL COUNTRY INSIGHTS')
     .setExternalDoc('Postman Collection', '/api-json')
     .build();
 
@@ -64,7 +63,6 @@ async function bootstrap() {
   app.use(compression());
   app.use(helmet());
   app.use(limiter);
-
 
   await app.listen(config.app.port, () => {
     console.warn(`server listening on port ${config.app.port}`);

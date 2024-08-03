@@ -4,6 +4,7 @@ import {
   ApiBearerAuth,
   ApiNotFoundResponse,
   ApiOkResponse,
+  ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
 import { LoginDto, RefreshTokenDto } from '../dtos';
@@ -21,6 +22,7 @@ import { AccessTokenGuard } from 'src/shared/guards';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @ApiOperation({ summary: 'Authenticate to obtain a token for accessing the endpoints.' })
   @ApiOkResponse({
     description: 'User logged in',
     type: LoginUserResponseData,

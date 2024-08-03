@@ -16,9 +16,9 @@ export class ResponseFormat {
     code: number = 200,
   ) {
     if (data !== undefined && data !== null && Object.keys(data).length > 0) {
-      this.sendResponse(res, ResponseCodes['0000'], data, message, code);
+      return this.sendResponse(res, ResponseCodes['0000'], data, message, code);
     } else {
-      this.sendResponse(res, ResponseCodes['0001'], null, message, code);
+      return this.sendResponse(res, ResponseCodes['0001'], null, message, code);
     }
   }
 
@@ -51,6 +51,6 @@ export class ResponseFormat {
       data: data ?? undefined,
     };
 
-    res.status(code).json(response);
+    return res.status(code).json(response);
   }
 }
