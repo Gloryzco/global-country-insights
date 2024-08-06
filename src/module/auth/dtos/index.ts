@@ -1,2 +1,2 @@
-export * from './refresh-token.dto';
+export * from './refreshToken.dto';
 export * from './login.dto';

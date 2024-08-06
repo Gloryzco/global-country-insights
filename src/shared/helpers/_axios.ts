@@ -14,14 +14,8 @@ export class AxiosHelper {
 
   static async sendGetRequest(
     path: string,
-    headers: Record<string, unknown>,
   ): Promise<IAxiosHelperResponse> {
-    const response = await axios.get(path, {
-      headers: {
-        'Content-Type': 'application/json',
-        ...headers,
-      },
-    });
+    const response = await axios.get(path);
 
     return {
       data: response.data,

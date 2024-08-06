@@ -5,7 +5,7 @@ import * as argon from 'argon2';
 import { AccessToken, JwtPayload, RefreshToken } from 'src/shared';
 import { UserService } from 'src/module/user';
 import configuration from 'src/config/configuration';
-import AppError from 'src/shared/utils/app-error.utils';
+import AppError from 'src/shared/utils/AppError';
 
 const config = configuration();
 
@@ -65,7 +65,7 @@ export class AuthService {
     const user = await this.userService.findById(sub);
 
     if (!user) {
-      throw new AppError('0002', 'Invalid refresh token');
+      throw new AppError('0003', 'Invalid refresh token');
     }
     const accessToken = await this.generateAccessToken(sub, email);
     return accessToken;
@@ -82,12 +82,12 @@ export class AuthService {
     const { email, password } = loginDto;
     const user = await this.userService.findByEmail(email);
     if (!user) {
-      throw new AppError('0002', 'User not found');
+      throw new AppError('0001', 'User not found');
     }
     const isValidPassword = await user.verifyPassword(password, user.password);
 
     if (!isValidPassword) {
-      throw new AppError('0002', 'invalid credentials');
+      throw new AppError('0003', 'invalid credentials');
     }
 
     const accessTokenDetails = await this.generateAccessToken(
@@ -110,7 +110,7 @@ export class AuthService {
   async logout(userId: string): Promise<boolean> {
     const user = await this.userService.findById(userId);
     if (!user || !user.refreshToken) {
-      throw new AppError('0005', 'Access denied. Login required');
+      throw new AppError('0003', 'Access denied. Login required');
     }
 
     await this.userService.update(userId, { refreshToken: null });

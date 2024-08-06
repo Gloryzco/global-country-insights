@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import * as argon from 'argon2';
 import { CreateUserDto } from '../dtos';
 import { User } from 'src/entity';
-import AppError from 'src/shared/utils/app-error.utils';
+import AppError from 'src/shared/utils/AppError';
 
 @Injectable()
 export class UserService {

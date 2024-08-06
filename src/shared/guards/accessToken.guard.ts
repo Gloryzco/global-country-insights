@@ -1,8 +1,8 @@
 import { ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { AuthGuard } from '@nestjs/passport';
-import AppError from '../utils/app-error.utils';
 import { UserService } from 'src/module';
+import AppError from '../utils/AppError';
 
 @Injectable()
 export class AccessTokenGuard extends AuthGuard('jwt') {
@@ -19,7 +19,7 @@ export class AccessTokenGuard extends AuthGuard('jwt') {
 
   handleRequest(err: any, user: any) {
     if (err || !user) {
-      throw new AppError('0005', 'Access token is missing or invalid.');
+      throw new AppError('0003', 'Access token is missing or invalid.');
     }
     return user;
   }

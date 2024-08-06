@@ -43,4 +43,8 @@ export default () => ({
     username: config.get<string>('SWAGGER_USERNAME'),
     password: config.get<string>('SWAGGER_PASSWORD'),
   },
+
+  rest_country:{
+    base_url: config.get<string>('API_BASE_URL'),
+  },
 });

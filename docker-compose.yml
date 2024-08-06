@@ -9,18 +9,18 @@ services:
     volumes:
       - ./redis:/data
 
-  mysql:
-      container_name: country_api_mysql
-      image: mysql:8.0
-      ports:
-        - 3306:3306
-      volumes:
-        - mysql-data:/var/lib/mysql
-      environment:
-        MYSQL_ROOT_PASSWORD: rootpassword
-        MYSQL_DATABASE: country_api
-        MYSQL_USER: root
-        MYSQL_PASSWORD: 
+  # mysql:
+  #     container_name: country_api_mysql
+  #     image: mysql:8.0
+  #     ports:
+  #       - 3306:3306
+  #     volumes:
+  #       - mysql-data:/var/lib/mysql
+  #     environment:
+  #       MYSQL_ROOT_PASSWORD: rootpassword
+  #       MYSQL_DATABASE: country_api
+  #       MYSQL_USER: root
+  #       MYSQL_PASSWORD: 
 
   app:
     container_name: country_api
@@ -36,5 +36,5 @@ services:
 volumes:
   redis:
     driver: local
-  mysql-data:
-    driver: local
+  # mysql-data:
+  #   driver: local

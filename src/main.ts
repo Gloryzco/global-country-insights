@@ -7,11 +7,13 @@ import * as compression from 'compression';
 import helmet from 'helmet';
 import { rateLimit } from 'express-rate-limit';
 import configuration from './config/configuration';
-import AppValidationError from './shared/utils/app-validation-error.utils';
+import { CountryService } from './module';
+import AppValidationError from './shared/utils/AppValidationError';
 
 const config = configuration();
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const countryService = app.get(CountryService);
 
   app.setGlobalPrefix('api/v1');
 

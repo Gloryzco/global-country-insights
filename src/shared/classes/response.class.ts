@@ -1,4 +1,7 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { mixin } from '@nestjs/common';
+import { ApiProperty, ApiPropertyOptions } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
+import { ValidateNested } from 'class-validator';
 
 export class CreatedUserResponseData {
   @ApiProperty({
@@ -83,4 +86,141 @@ export class TaskResponseDto {
 
   @ApiProperty({ example: '2023-01-01T00:00:00.000Z' })
   createdAt: Date;
+}
+
+export function withPaginatedResponse<
+  TBase extends new (...args: any[]) => any,
+>(Base: TBase, baseTypeIsArray = true, options?: ApiPropertyOptions) {
+  class ResponseDTO {
+    @ApiProperty({
+      example: 'OK',
+    })
+    status: string;
+
+    @ApiProperty({
+      example: '00',
+    })
+    code: string;
+
+    @ApiProperty({
+      example: 'Successful',
+    })
+    message: string;
+
+    @ApiProperty({
+      example: 100,
+      description: 'Total number of records',
+    })
+    totalRecords: number;
+
+    @ApiProperty({
+      example: 3,
+      description: 'Current page',
+    })
+    currentPage: number;
+    @ApiProperty({
+      example: 10,
+      description: 'Total available pages',
+    })
+    totalPages: number;
+
+    @ApiProperty({
+      isArray: baseTypeIsArray,
+      type: Base,
+      ...options,
+    })
+    @ValidateNested({ each: true })
+    @Type(() => Base)
+    data: InstanceType<TBase>;
+
+    constructor(
+      data: InstanceType<TBase>,
+      code: string,
+      status: string,
+      message: string,
+    ) {
+      this.data = data;
+      this.status = status;
+      this.code = code;
+      this.message = message;
+      // this.pagination = { page, limit };
+    }
+  }
+
+  return mixin(ResponseDTO);
+}
+
+export function withBaseResponse<TBase extends new (...args: any[]) => any>(
+  Base: TBase,
+  baseTypeIsArray = true,
+  options?: ApiPropertyOptions,
+) {
+  class ResponseDTO {
+    @ApiProperty({
+      example: 'OK',
+    })
+    status: string;
+
+    @ApiProperty({
+      example: '00',
+    })
+    code: string;
+
+    @ApiProperty({
+      example: 'Successful',
+    })
+    message: string;
+
+    // @ApiProperty({
+    //   description: 'Pagination information',
+    // })
+    // @ValidateNested()
+    // @Type(() => Pagination)
+    // pagination: Pagination;
+
+    @ApiProperty({
+      isArray: baseTypeIsArray,
+      type: Base,
+      ...options,
+    })
+    @ValidateNested({ each: true })
+    @Type(() => Base)
+    data: InstanceType<TBase>;
+
+    constructor(
+      data: InstanceType<TBase>,
+      code: string,
+      status: string,
+      message: string,
+    ) {
+      this.data = data;
+      this.status = status;
+      this.code = code;
+      this.message = message;
+      // this.pagination = { page, limit };
+    }
+  }
+
+  return mixin(ResponseDTO);
+}
+
+export class paginatedResponse<T> {
+  @ApiProperty({
+    example: 100,
+    description: 'Total number of records',
+  })
+  totalRecords: number;
+
+  @ApiProperty({
+    example: 100,
+    description: 'Current page',
+  })
+  currentPage: number;
+  @ApiProperty({
+    example: 100,
+    description: 'Total number of pages',
+  })
+  totalPages: number;
+
+  data: T;
 }

@@ -1,100 +1,58 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
 @Entity('countries')
 export class Country {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'varchar', length: 3, unique: true })
-  cca3: string;
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  commonName: string;
 
-  @Column({ type: 'varchar', length: 255 })
-  nameCommon: string;
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  officialName: string;
 
-  @Column({ type: 'varchar', length: 255 })
-  nameOfficial: string;
+  @Column({ type: 'json', nullable: true })
+  nativeName: Record<string, { official: string; common: string }>;
 
-  @Column('json')
-  nativeName: Record<string, { official?: string; common?: string }>;
-
-  @Column('simple-array')
-  tld: string[];
-
-  @Column({ type: 'varchar', length: 2 })
+  @Column({ type: 'varchar', length: 2, nullable: true })
   cca2: string;
 
-  @Column({ type: 'varchar', length: 3 })
-  ccn3: string;
+  @Column({ type: 'varchar', length: 3, nullable: true })
+  cca3: string;
 
-  @Column({ type: 'boolean' })
-  independent: boolean;
-
-  @Column({ type: 'varchar', length: 255 })
-  status: string;
-
-  @Column({ type: 'boolean' })
-  unMember: boolean;
-
-  @Column('json')
-  currencies: Record<string, { name: string; symbol: string }>;
-
-  @Column('json')
-  idd: { root: string; suffixes: string[] };
-
-  @Column('simple-array')
-  capital: string[];
-
-  @Column('simple-array')
-  altSpellings: string[];
-
-  @Column({ type: 'varchar', length: 255 })
-  region: string;
-
-  @Column('json')
-  languages: Record<string, string>;
-
-  @Column('json')
-  translations: Record<string, { official: string; common: string }>;
-
-  @Column('point')
-  latlng: [number, number];
-
-  @Column({ type: 'boolean' })
-  landlocked: boolean;
-
-  @Column({ type: 'float' })
-  area: number;
-
-  @Column('json')
-  demonyms: Record<string, { f: string; m: string }>;
-
-  @Column({ type: 'varchar', length: 255 })
-  flag: string;
-
-  @Column('json')
-  maps: { googleMaps: string; openStreetMaps: string };
-
-  @Column({ type: 'int' })
+  @Column({ type: 'int', nullable: true })
   population: number;
 
-  @Column('json')
-  car: { signs: string[]; side: string };
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  region: string;
 
-  @Column('simple-array')
-  timezones: string[];
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  subregion: string;
 
-  @Column('simple-array')
-  continents: string[];
+  @Column({ type: 'json', nullable: true })
+  languages: Record<string, string>;
 
-  @Column('json')
-  flags: { png: string; svg: string };
+  @Column({ type: 'json', nullable: true })
+  currencies: { name: string; symbol: string };
 
-  @Column('json', { nullable: true })
-  coatOfArms?: Record<string, any>;
+  @Column({ type: 'simple-array', nullable: true })
+  capital: string[];
 
-  @Column({ type: 'varchar', length: 255 })
-  startOfWeek: string;
+  @Column({ type: 'simple-array', nullable: true })
+  latlng: [number, number];
 
-  @Column('json')
-  capitalInfo: { latlng: [number, number] };
+  @Column({ type: 'boolean', nullable: true })
+  landlocked: boolean;
+
+  @Column({ type: 'simple-array', nullable: true })
+  borderingCountries: string[];
+
+  @Column({ type: 'float', nullable: true })
+  area: number;
+
+  @Column({ type: 'json', nullable: true })
+  flags: { png: string; svg: string; alt: string };
+
+  @Column({ type: 'json', nullable: true })
+  coatOfArms: { png: string; svg: string };
 }

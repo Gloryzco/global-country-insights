@@ -1,4 +1,4 @@
-import { ResponseCodes } from './response-codes.utils';
+import { ResponseCodes } from './ResponseCodes';
 
 class AppError extends Error {
   message: string;
@@ -18,18 +18,36 @@ class AppError extends Error {
   }
 
   httpStatus() {
-    switch (this.responseBody.status) {
+    switch (this.responseBody?.status) {
       case 'OK':
-        return 200;
+        if (this.responseBody.code == '00') {
+          return 200;
+        }
+
+        if (this.responseBody.code == '01') {
+          return 202;
+        }
+
       case 'FAIL':
+        if (this.responseBody.code == '02') {
+          return 400;
+        }
+
+        if (this.responseBody.code == '03') {
+          return 400;
+        }
+
         if (this.responseBody.code == '05') {
           return 401;
         }
+
         return 400;
+
       case 'DENIED':
         return 400;
+
       default:
-        return 500; // Internal Server Error for unknown status
+        return 500;
     }
   }
 }

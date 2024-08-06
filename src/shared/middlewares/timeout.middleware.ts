@@ -9,7 +9,7 @@ import {
 import { Request, Response, NextFunction } from 'express';
 import { Observable, TimeoutError, throwError } from 'rxjs';
 import { catchError, timeout } from 'rxjs/operators';
-import AppError from '../utils/app-error.utils';
+import AppError from '../utils/AppError';
 
 @Injectable()
 export class RequestTimeMiddleware implements NestMiddleware {
@@ -42,7 +42,6 @@ export class TimeoutInterceptor implements NestInterceptor {
       catchError((err) => {
         if (err instanceof TimeoutError) {
           throw new AppError('0001', 'Gateway timeout has occurred');
-          //   throw new GatewayTimeoutException('Gateway timeout has occurred');
         }
         return throwError(() => err);
       }),

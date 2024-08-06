@@ -4,18 +4,17 @@ import {
   ArgumentsHost,
   NotFoundException,
 } from '@nestjs/common';
+import { AxiosError } from 'axios';
 import { Response } from 'express';
 import { ResponseCodes, ResponseFormat } from 'src/shared';
-import AppValidationError from './app-validation-error.utils';
-import AppError from './app-error.utils';
+import AppError from './AppError';
+import AppValidationError from './AppValidationError';
 
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {
   catch(exception: Error, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
-
-    console.error('Global Error Handler', exception);
 
     if (exception instanceof AppError) {
       ResponseFormat.handleAppErrorResponse(
@@ -32,6 +31,8 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         exception.message,
         400,
       );
+    } else if (exception instanceof AxiosError) {
+      ResponseFormat.handleAppErrorResponse(response, '0006', 400);
     } else if (
       exception.name === 'JsonWebTokenError' ||
       exception.name === 'TokenExpiredError'
@@ -44,7 +45,5 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     } else {
       ResponseFormat.handleAppErrorResponse(response, '0006', 403);
     }
-
-    // ER_DUP_ENTRY
   }
 }
