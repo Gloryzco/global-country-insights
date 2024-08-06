@@ -2,7 +2,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsOptional, IsString, Min, Max, min, Length } from 'class-validator';
 
-export class codeDTO {
+export class CodeDTO {
   @Length(3, 3, {message: 'Code must be 3 characters long'})
   @IsString()
   @Type(() => String)

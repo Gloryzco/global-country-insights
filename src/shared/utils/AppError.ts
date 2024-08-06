@@ -1,18 +1,23 @@
 import { ResponseCodes } from './ResponseCodes';
+import { HttpStatus } from '@nestjs/common';
 
 class AppError extends Error {
   message: string;
   isOperational: boolean;
   responseCode: string;
   responseBody: any;
+  httpStatusCode: HttpStatus;
 
-  constructor(responseCode: string, message?: string) {
+  constructor(responseCode: string, message?: string, httpStatus?: HttpStatus) {
     super();
 
     this.isOperational = true;
     this.message = message ? message : ResponseCodes[responseCode].message;
     this.responseCode = responseCode;
     this.responseBody = ResponseCodes[responseCode];
+    this.responseBody = ResponseCodes[responseCode];
+    this.httpStatusCode = httpStatus;
+    console.log(httpStatus, 'from constructor');
 
     Error.captureStackTrace(this, this.constructor);
   }
@@ -21,33 +26,34 @@ class AppError extends Error {
     switch (this.responseBody?.status) {
       case 'OK':
         if (this.responseBody.code == '00') {
-          return 200;
+          return this.httpStatusCode ?? 200;
         }
 
         if (this.responseBody.code == '01') {
-          return 202;
+          return this.httpStatusCode ?? 202;
         }
 
       case 'FAIL':
-        if (this.responseBody.code == '02') {
-          return 400;
+        if (this.responseBody.code == '01') {
+          return this.httpStatusCode ?? 404;
         }
 
         if (this.responseBody.code == '03') {
-          return 400;
+          return this.httpStatusCode ?? 400;
         }
 
         if (this.responseBody.code == '05') {
-          return 401;
+          return this.httpStatusCode ?? 401;
         }
-
-        return 400;
+        console.log(this.httpStatusCode);
+        return this.httpStatusCode ?? 400;
 
       case 'DENIED':
-        return 400;
+        console.log(this.httpStatusCode);
+        return this.httpStatusCode ?? 400;
 
       default:
-        return 500;
+        return this.httpStatusCode ?? 500;
     }
   }
 }

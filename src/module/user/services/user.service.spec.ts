@@ -2,10 +2,12 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { UserService } from './user.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { User } from 'src/entities';
+// import { User } from 'src/entities';
 import * as argon from 'argon2';
 import { CreateUserDto } from '../dtos';
-import AppError from 'src/shared/utils/app-error.utils';
+import { User } from 'src/entity';
+import AppError from 'src/shared/utils/AppError';
+// import AppError from 'src/shared/utils/app-error.utils';
 
 describe('UserService', () => {
   let userService: UserService;

@@ -2,7 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Country } from 'src/entity';
-import { CountryDto, LanguageDetail, QueryDTO, RegionResponseDto } from 'src/module';
+import {
+  CountryDto,
+  LanguageDetail,
+  QueryDTO,
+  RegionResponseDto,
+} from 'src/module';
+import AppError from '../utils/AppError';
 
 @Injectable()
 export class QueryBuilderService {
@@ -100,7 +106,9 @@ export class QueryBuilderService {
     }
   }
 
-  async getRegionsWithPopulation(regions: string[] = []): Promise<RegionResponseDto[]> {
+  async getRegionsWithPopulation(
+    regions: string[] = [],
+  ): Promise<RegionResponseDto[]> {
     try {
       // Step 1: Aggregate population by region
       const aggregatedRegions = await this.countryRepository
@@ -108,7 +116,9 @@ export class QueryBuilderService {
         .select('country.region', 'region')
         .addSelect('SUM(country.population)', 'totalPopulation')
         .groupBy('country.region')
-        .where(regions.length > 0 ? 'country.region IN (:...regions)' : '1=1', { regions })
+        .where(regions.length > 0 ? 'country.region IN (:...regions)' : '1=1', {
+          regions,
+        })
         .getRawMany();
 
       // Step 2: Get detailed country information for each region
@@ -124,7 +134,7 @@ export class QueryBuilderService {
             countries,
             totalPopulation: Number(region.totalPopulation),
           };
-        })
+        }),
       );
 
       return regionDtos;
@@ -134,21 +144,46 @@ export class QueryBuilderService {
     }
   }
 
-  async getLanguagesWithDetails(): Promise<LanguageDetail[]> {
+  async getLanguagesWithDetails(): Promise<any> {
     try {
-      const languagesData = await this.countryRepository
+
+      const languagesData: {
+        [key: string]: { countries: string[]; totalSpeakers: number };
+      } = {};
+
+      const countriesData = await this.countryRepository
         .createQueryBuilder('country')
-        .select('language', 'language')
-        .addSelect('SUM(population)', 'totalSpeakers')
-        .addSelect('array_agg(DISTINCT country.name)', 'countries')
-        .groupBy('language')
+        .select(`JSON_UNQUOTE(country.languages)`, 'language')
+        .addSelect('country.population', 'totalSpeakers')
+        .addSelect('country.commonName', 'country')
         .getRawMany();
 
-      return languagesData.map(data => ({
-        language: data.language,
-        countries: JSON.parse(data.countries),
-        totalSpeakers: Number(data.totalSpeakers),
+      countriesData.forEach((data) => {
+        const languages = JSON.parse(data.language);
+
+        if (languages) {
+          Object.entries(languages).forEach(([key, value]) => {
+            if (!languagesData[languages[key]]) {
+              languagesData[languages[key]] = {
+                countries: [data.country],
+                totalSpeakers: Number(data.totalSpeakers),
+              };
+            } else {
+              languagesData[languages[key]].countries.push(data.country);
+              languagesData[languages[key]].totalSpeakers += Number(
+                data.totalSpeakers,
+              );
+            }
+          });
+        }
+      });
+
+      const result = Object.keys(languagesData).map((key) => ({
+        language: key,
+        countries: languagesData[key].countries,
+        totalSpeakers: languagesData[key].totalSpeakers,
       }));
+      return result;
     } catch (error) {
       console.error('Error getting languages with details:', error);
       throw new Error('Failed to get languages with details');
@@ -168,20 +203,26 @@ export class QueryBuilderService {
     try {
       const country = await this.countryRepository
         .createQueryBuilder('country')
-        .select('country.commonName', 'name')
-        .addSelect('country.area', 'area')
+        .select('country.commonName')
+        .addSelect('country.area')
         .orderBy('country.area', 'DESC')
         .limit(1)
         .getRawOne();
+      if (country) {
+        return { name: country.country_commonName, area: country.country_area };
+      }
 
-      return { name: country.name, area: country.area };
+      throw new Error(`Could not find`);
     } catch (error) {
       console.error('Error getting largest country by area:', error);
-      throw new Error('Failed to get largest country by area');
+      throw new AppError('0001', 'Failed to get largest country by area');
     }
   }
 
-  async getSmallestCountryByPopulation(): Promise<{ name: string; population: number }> {
+  async getSmallestCountryByPopulation(): Promise<{
+    name: string;
+    population: number;
+  }> {
     try {
       const country = await this.countryRepository
         .createQueryBuilder('country')
@@ -198,18 +239,24 @@ export class QueryBuilderService {
     }
   }
 
-  async getMostWidelySpokenLanguage(): Promise<{ language: string; numberOfSpeakers: number }> {
+  async getMostWidelySpokenLanguage(): Promise<{
+    language: string;
+    numberOfSpeakers: number;
+  }> {
     try {
       const languageData = await this.countryRepository
         .createQueryBuilder('country')
-        .select('country.languages', 'language')
+        .select('JSON_UNQUOTE(country.languages)', 'language')
         .addSelect('SUM(population)', 'totalSpeakers')
         .groupBy('language')
         .orderBy('totalSpeakers', 'DESC')
         .limit(1)
         .getRawOne();
-
-      return { language: languageData.language, numberOfSpeakers: Number(languageData.totalSpeakers) };
+      const languageKeys = Object.keys(JSON.parse(languageData.language)).at(0)
+      return {
+        language: JSON.parse(languageData.language)[languageKeys],
+        numberOfSpeakers: Number(languageData.totalSpeakers),
+      };
     } catch (error) {
       console.error('Error getting most widely spoken language:', error);
       throw new Error('Failed to get most widely spoken language');

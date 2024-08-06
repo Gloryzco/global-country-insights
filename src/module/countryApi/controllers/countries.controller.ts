@@ -11,6 +11,7 @@ import {
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,
+  ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
@@ -18,11 +19,12 @@ import {
 import { ResponseFormat, withPaginatedResponse } from 'src/shared';
 import { AccessTokenGuard } from 'src/shared/guards';
 import {
-  codeDTO,
+  CodeDTO,
   CountryDto,
   CountryResponseDto,
   LanguageDetail,
   QueryDTO,
+  RegionResponseDto,
   StatisticsDto,
 } from '../dtos';
 import { CountryService } from '../services';
@@ -39,13 +41,17 @@ export class CountriesController {
     status: 400,
     description: 'Bad request',
   })
+  @ApiNotFoundResponse({
+    status: 404,
+    description: 'Not found',
+  })
   @ApiOperation({
     summary:
       'Retrieve a list of countries with pagination and optional filtering by region or population size',
   })
   @ApiOkResponse({
     description: 'Successful',
-    type: withPaginatedResponse(CountryResponseDto, true),
+    type: CountryResponseDto,
   })
   @Get()
   async getCountries(
@@ -66,9 +72,13 @@ export class CountriesController {
     status: 400,
     description: 'Bad request',
   })
+  @ApiNotFoundResponse({
+    status: 404,
+    description: 'Not found',
+  })
   @ApiOkResponse({
     description: 'Successful',
-    type: [LanguageDetail],
+    type: [RegionResponseDto],
   })
   @ApiOperation({
     summary:
@@ -98,6 +108,10 @@ export class CountriesController {
     description: 'Successful',
     type: [LanguageDetail],
   })
+  @ApiNotFoundResponse({
+    status: 404,
+    description: 'Not found',
+  })
   @ApiOperation({
     summary:
       'Retrieve a list of languages with details including the countries they are spoken in and the total number of speakers globally.',
@@ -121,19 +135,23 @@ export class CountriesController {
     description: 'Successful',
     type: StatisticsDto,
   })
+  @ApiNotFoundResponse({
+    status: 404,
+    description: 'Not found',
+  })
   @ApiOperation({
-    summary: 'Retrieve aggregated statistics including total number of countries, largest country by area, smallest country by population, and most widely spoken language.',
+    summary:
+      'Retrieve aggregated statistics including total number of countries, largest country by area, smallest country by population, and most widely spoken language.',
   })
   @Get('statistics')
   async getStatistics(@Response() res) {
- 
-      const statisticsData = await this.countryService.getStatistics();
-      return ResponseFormat.successResponse(
-        res,
-        statisticsData,
-        'Country details fetched Successfully',
-        HttpStatus.OK,
-      );
+    const statisticsData = await this.countryService.getStatistics();
+    return ResponseFormat.successResponse(
+      res,
+      statisticsData,
+      'Country details fetched Successfully',
+      HttpStatus.OK,
+    );
   }
 
   @ApiBadRequestResponse({
@@ -144,16 +162,20 @@ export class CountriesController {
     description: 'Successful',
     type: withPaginatedResponse(CountryResponseDto, true),
   })
+  @ApiNotFoundResponse({
+    status: 404,
+    description: 'Not found',
+  })
   @ApiOperation({
     summary:
       'Retrieve detailed information for a specific country, including its languages, population, area, and bordering countries.',
   })
   @Get(':code')
   async getCountryDetail(
-    @Query() code: codeDTO,
+    @Query() code: CodeDTO,
     @Response() res,
   ): Promise<ResponseFormat> {
-    const countryDetail = await this.countryService.getCountryDetail(code);
+    const countryDetail = await this.countryService.getCountryDetailbyCode(code);
     return ResponseFormat.successResponse(
       res,
       countryDetail,

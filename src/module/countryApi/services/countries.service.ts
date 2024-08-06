@@ -1,5 +1,12 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
-import { codeDTO, CountryDto, LanguageDetail, QueryDTO, RegionResponseDto, StatisticsDto } from '../dtos';
+import {
+  CodeDTO,
+  CountryDto,
+  LanguageDetail,
+  QueryDTO,
+  RegionResponseDto,
+  StatisticsDto,
+} from '../dtos';
 import { RedisService } from 'src/module/redis';
 import { AxiosHelper, QueryBuilderService } from 'src/shared';
 import configuration from 'src/config/configuration';
@@ -41,6 +48,26 @@ export class CountryService {
       coatOfArms: JSON.stringify(apiCountry.coatOfArms),
     }));
 
+    const redisMappedCountries = apiCountries.map((apiCountry: any) => ({
+      commonName: apiCountry.name?.common,
+      officialName: apiCountry.name?.official,
+      nativeName: apiCountry.name?.nativeName,
+      cca2: apiCountry.cca2,
+      cca3: apiCountry.cca3,
+      region: apiCountry.region,
+      subregion: apiCountry.subregion,
+      languages: apiCountry.languages,
+      currencies: apiCountry.currencies,
+      population: apiCountry.population,
+      capital: apiCountry.capital,
+      latlng: apiCountry.latlng,
+      landlocked: apiCountry.landlocked,
+      borderingCountries: apiCountry.borders,
+      area: apiCountry.area,
+      flags: apiCountry.flags,
+      coatOfArms: apiCountry.coatOfArms,
+    }));
+
     // Clear existing data
     await Promise.all([
       this.queryBuilder.clearCountries(),
@@ -50,9 +77,9 @@ export class CountryService {
     // Save new data
     await Promise.all([
       this.queryBuilder.saveCountries(mappedCountries),
-      this.redisService.set('countries', mappedCountries),
+      this.redisService.set('countries', redisMappedCountries),
     ]);
-    return mappedCountries;
+    return redisMappedCountries;
   }
 
   async getCountries(queryDto: QueryDTO): Promise<any[]> {
@@ -62,6 +89,13 @@ export class CountryService {
 
     if (countries) {
       countries = this.filterCountriesByQuery(countries, queryDto);
+      if (countries.length === 0) {
+        throw new AppError(
+          '0001',
+          'No countries found for the specified query',
+          HttpStatus.NOT_FOUND,
+        );
+      }
       return countries;
     }
 
@@ -72,10 +106,22 @@ export class CountryService {
       return countries;
     }
 
-    await this.initializeCountries();
-    countries = await this.redisService.get(cacheKey);
+    throw new AppError(
+      '0001',
+      'No countries found for the specified query',
+      HttpStatus.NOT_FOUND,
+    );
+  }
 
-    return this.filterCountriesByQuery(countries, queryDto);
+  private toTitleCase(str: string): string[] {
+    return str
+      .toLowerCase()
+      .split(',')
+      .map((word) => {
+        word = word.trim();
+        word = word.charAt(0).toUpperCase() + word.slice(1);
+        return word;
+      });
   }
 
   private filterCountriesByQuery(
@@ -84,7 +130,10 @@ export class CountryService {
   ): any[] {
     return countries
       .filter((country) => {
-        if (queryDto.region && country.region !== queryDto.region) return false;
+        const countryRegion = this.toTitleCase(queryDto.region);
+
+        if (!countryRegion.includes(country.region)) return false;
+        console.log(countryRegion);
         if (
           queryDto.minPopulation &&
           country.population < queryDto.minPopulation
@@ -118,54 +167,87 @@ export class CountryService {
       }));
   }
 
-  async getCountryDetail(codeDTO: codeDTO): Promise<CountryDto> {
+  async getCountryDetailbyCode(codeDTO: CodeDTO): Promise<CountryDto> {
     const { code } = codeDTO;
-    const cacheKey = 'countries';
+    const cacheKey = `country:${code.toUpperCase()}`;
 
-    let countries = await this.redisService.get(cacheKey);
-    try {
-      if (countries) {
-        const countryDetail = countries.find(
-          (country) => country.cca3 === code.toUpperCase(),
-        );
+    let countryDetail = await this.redisService.get(cacheKey);
 
-        if (countryDetail) {
-          return countryDetail;
-        }
-      }
-
-      let countryDetail = await this.queryBuilder.findCountryByCode(code);
-
-      if (countryDetail) {
-        countries = countries || [];
-        countries.push(countryDetail);
-        await this.redisService.set(cacheKey, countries);
-        return countryDetail;
-      }
-    } catch (error) {
-      console.log(error);
+    if (countryDetail) {
+      return countryDetail as CountryDto;
     }
+
+    countryDetail = await this.queryBuilder.findCountryByCode(code);
+    countryDetail.nativeName = JSON.parse(
+      countryDetail.nativeName as unknown as string,
+    );
+    countryDetail.coatOfArms = JSON.parse(
+      countryDetail.coatOfArms as unknown as string,
+    );
+    countryDetail.flags = JSON.parse(countryDetail.flags as unknown as string);
+    countryDetail.currencies = JSON.parse(
+      countryDetail.currencies as unknown as string,
+    );
+    countryDetail.languages = JSON.parse(countryDetail.languages as unknown as string);
+    
+
+    if (countryDetail) {
+      await this.redisService.set(cacheKey, countryDetail);
+      return countryDetail;
+    }
+
+    throw new AppError('0001', 'Country not found');
   }
 
-  async getRegionsWithPopulation(regionDTO: RegionDTO): Promise<RegionResponseDto[]> {
-    try {
-      const regionsArray = regionDTO.regions
-      ? regionDTO.regions.split(',').map(region => region.trim())
+  async getRegionsWithPopulation(
+    regionDTO: RegionDTO,
+  ): Promise<RegionResponseDto[]> {
+    const regionsArray = regionDTO.regions
+      ? regionDTO.regions.split(',').map((region) => region.trim())
       : [];
 
-    const aggregatedRegions = await this.queryBuilder.getRegionsWithPopulation(regionsArray);
+    const cacheKey = `regionsPopulation:${regionsArray.join(',')}`;
 
-    const regionDtos: RegionResponseDto[] = aggregatedRegions.map(region => ({
-      name: region.name,
-      countries: region.countries,
-      totalPopulation: Number(region.totalPopulation),
-    }));
+    let cachedData = await this.redisService.get(cacheKey);
+    if (cachedData) {
+      return cachedData as RegionResponseDto[];
+    }
+
+    const aggregatedRegions =
+      await this.queryBuilder.getRegionsWithPopulation(regionsArray);
+
+    if (aggregatedRegions.length === 0) {
+      throw new AppError(
+        '0001',
+        'No regions found for the specified query',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    const regionDtos: RegionResponseDto[] = aggregatedRegions.map((region) => {
+      region.countries.map((country) => {
+        country.nativeName = JSON.parse(
+          country.nativeName as unknown as string,
+        );
+        country.coatOfArms = JSON.parse(
+          country.coatOfArms as unknown as string,
+        );
+        country.flags = JSON.parse(country.flags as unknown as string);
+        country.currencies = JSON.parse(
+          country.currencies as unknown as string,
+        );
+        country.languages = JSON.parse(country.languages as unknown as string);
+      });
+      return {
+        name: region.name,
+        countries: region.countries,
+        totalPopulation: Number(region.totalPopulation),
+      };
+    });
+
+    await this.redisService.set(cacheKey, regionDtos);
 
     return regionDtos;
-    } catch (error) {
-      console.error('Error getting regions with population:', error);
-      throw new Error('Failed to get regions with population');
-    }
   }
 
   async getLanguagesWithDetails(): Promise<LanguageDetail[]> {
@@ -182,31 +264,39 @@ export class CountryService {
   }
 
   async getStatistics(): Promise<StatisticsDto> {
-    try {
-      const totalCountries = await this.queryBuilder.getTotalCountries();
-      const largestCountry = await this.queryBuilder.getLargestCountryByArea();
-      const smallestCountry = await this.queryBuilder.getSmallestCountryByPopulation();
-      const mostWidelySpokenLanguage = await this.queryBuilder.getMostWidelySpokenLanguage();
+    const cacheKey = 'statistics';
 
-      return {
-        totalCountries,
-        largestCountryByArea: {
-          name: largestCountry.name,
-          area: largestCountry.area,
-        },
-        smallestCountryByPopulation: {
-          name: smallestCountry.name,
-          population: smallestCountry.population,
-        },
-        mostWidelySpokenLanguage: {
-          language: mostWidelySpokenLanguage.language,
-          numberOfSpeakers: mostWidelySpokenLanguage.numberOfSpeakers,
-        },
-      };
-    } catch (error) {
-      console.error('Error getting statistics:', error);
-      throw new Error('Failed to get statistics');
+    let statistics = await this.redisService.get(cacheKey);
+
+    if (statistics) {
+      return statistics;
     }
+
+    const totalCountries = await this.queryBuilder.getTotalCountries();
+    const largestCountry = await this.queryBuilder.getLargestCountryByArea();
+    const smallestCountry =
+      await this.queryBuilder.getSmallestCountryByPopulation();
+    const mostWidelySpokenLanguage =
+      await this.queryBuilder.getMostWidelySpokenLanguage();
+
+    const statisticsDto: StatisticsDto = {
+      totalCountries,
+      largestCountryByArea: {
+        name: largestCountry.name,
+        area: largestCountry.area,
+      },
+      smallestCountryByPopulation: {
+        name: smallestCountry.name,
+        population: smallestCountry.population,
+      },
+      mostWidelySpokenLanguage: {
+        language: mostWidelySpokenLanguage.language,
+        numberOfSpeakers: mostWidelySpokenLanguage.numberOfSpeakers,
+      },
+    };
+
+    await this.redisService.set(cacheKey, JSON.stringify(statisticsDto));
+
+    return statisticsDto;
   }
-  
 }
