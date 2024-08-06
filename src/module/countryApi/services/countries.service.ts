@@ -24,7 +24,7 @@ export class CountryService {
   ) {}
 
   async initializeCountries(): Promise<void> {
-    const apiUrl = 'https://restcountries.com/v3.1/all';
+    const apiUrl = config.rest_country.base_url + 'all';
     const response = await AxiosHelper.sendGetRequest(apiUrl);
     const apiCountries = response.data;
 
@@ -83,9 +83,16 @@ export class CountryService {
   }
 
   async getCountries(queryDto: QueryDTO): Promise<any[]> {
+    let { page, limit } = queryDto;
+    page = page ? page : 1;
+    limit = limit ? limit : 20;
+    const offset = page - 1 * limit;
     const cacheKey = 'countries';
 
-    let countries = await this.redisService.get(cacheKey);
+    let countries = await this.redisService.get(cacheKey, 'countries', {
+      page: page,
+      limit: limit,
+    });
 
     if (countries) {
       countries = this.filterCountriesByQuery(countries, queryDto);
@@ -117,54 +124,88 @@ export class CountryService {
     return str
       .toLowerCase()
       .split(',')
-      .map((word) => {
-        word = word.trim();
-        word = word.charAt(0).toUpperCase() + word.slice(1);
-        return word;
-      });
+      .map((word) => word.trim())
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1));
   }
 
-  private filterCountriesByQuery(
+  public filterCountriesByQuery(
     countries: ICountry[],
     queryDto: QueryDTO,
-  ): any[] {
-    return countries
-      .filter((country) => {
-        const countryRegion = this.toTitleCase(queryDto.region);
+  ): {
+    currentPage: number;
+    totalPages: number;
+    totalRecords: number;
+    countries: ICountry[];
+  } {
+    const start = queryDto.page ? (queryDto.page - 1) * queryDto.limit : 0;
+    const end = queryDto.limit ? start + queryDto.limit : -1;
+    const queryRegions = queryDto.region
+      ? this.toTitleCase(queryDto.region)
+      : [];
+    const filteredCountries = countries
+    .filter((country) => {
+      const countryRegion =
+        country.region.charAt(0).toUpperCase() + country.region.slice(1);
 
-        if (!countryRegion.includes(country.region)) return false;
-        console.log(countryRegion);
-        if (
-          queryDto.minPopulation &&
-          country.population < queryDto.minPopulation
-        )
-          return false;
-        if (
-          queryDto.maxPopulation &&
-          country.population > queryDto.maxPopulation
-        )
-          return false;
-        return true;
-      })
-      .map((country) => ({
-        commonName: country.commonName,
-        officialName: country.officialName,
-        nativeName: JSON.parse(country.nativeName as unknown as string),
-        cca2: country.cca2,
-        cca3: country.cca3,
-        region: country.region,
-        subregion: country.subregion,
-        languages: JSON.parse(country.languages as unknown as string),
-        currencies: JSON.parse(country.currencies as unknown as string),
-        population: country.population,
-        capital: country.capital,
-        latlng: country.latlng,
-        landlocked: country.landlocked,
-        borderingCountries: country.borderingCountries,
-        area: country.area,
-        flags: JSON.parse(country.flags as unknown as string),
-        coatOfArms: JSON.parse(country.coatOfArms as unknown as string),
-      }));
+      if (queryRegions.length > 0 && !queryRegions.includes(countryRegion))
+        return false;
+      if (
+        queryDto.minPopulation &&
+        country.population < queryDto.minPopulation
+      )
+        return false;
+      if (
+        queryDto.maxPopulation &&
+        country.population > queryDto.maxPopulation
+      )
+        return false;
+      return true;
+    });
+    return {
+      currentPage: queryDto.page ? queryDto.page : 1,
+      totalPages: Math.ceil(
+        filteredCountries.length / (queryDto.limit ? queryDto.limit : filteredCountries.length),
+      ),
+      totalRecords:filteredCountries.length,
+      countries: filteredCountries
+        .slice(start, end)
+        .map((country) => {
+          return {
+            commonName: country.commonName,
+            officialName: country.officialName,
+            nativeName:
+              typeof country.nativeName === 'string'
+                ? JSON.parse(country.nativeName)
+                : country.nativeName,
+            cca2: country.cca2,
+            cca3: country.cca3,
+            region: country.region,
+            subregion: country.subregion,
+            languages:
+              typeof country.languages === 'string'
+                ? JSON.parse(country.languages)
+                : country.languages,
+            currencies:
+              typeof country.currencies === 'string'
+                ? JSON.parse(country.currencies)
+                : country.currencies,
+            population: country.population,
+            capital: country.capital,
+            latlng: country.latlng,
+            landlocked: country.landlocked,
+            borderingCountries: country.borderingCountries,
+            area: country.area,
+            flags:
+              typeof country.flags === 'string'
+                ? JSON.parse(country.flags)
+                : country.flags,
+            coatOfArms:
+              typeof country.coatOfArms === 'string'
+                ? JSON.parse(country.coatOfArms)
+                : country.coatOfArms,
+          };
+        }),
+    };
   }
 
   async getCountryDetailbyCode(codeDTO: CodeDTO): Promise<CountryDto> {
@@ -178,25 +219,32 @@ export class CountryService {
     }
 
     countryDetail = await this.queryBuilder.findCountryByCode(code);
-    countryDetail.nativeName = JSON.parse(
-      countryDetail.nativeName as unknown as string,
-    );
-    countryDetail.coatOfArms = JSON.parse(
-      countryDetail.coatOfArms as unknown as string,
-    );
-    countryDetail.flags = JSON.parse(countryDetail.flags as unknown as string);
-    countryDetail.currencies = JSON.parse(
-      countryDetail.currencies as unknown as string,
-    );
-    countryDetail.languages = JSON.parse(countryDetail.languages as unknown as string);
-    
-
     if (countryDetail) {
+      countryDetail.nativeName =
+        typeof countryDetail.nativeName === 'string'
+          ? JSON.parse(countryDetail.nativeName)
+          : countryDetail.nativeName;
+      countryDetail.coatOfArms =
+        typeof countryDetail.coatOfArms === 'string'
+          ? JSON.parse(countryDetail.coatOfArms)
+          : countryDetail.coatOfArms;
+      countryDetail.flags =
+        typeof countryDetail.flags === 'string'
+          ? JSON.parse(countryDetail.flags)
+          : countryDetail.flags;
+      countryDetail.currencies =
+        typeof countryDetail.currencies === 'string'
+          ? JSON.parse(countryDetail.currencies)
+          : countryDetail.currencies;
+      countryDetail.languages =
+        typeof countryDetail.languages === 'string'
+          ? JSON.parse(countryDetail.languages)
+          : countryDetail.languages;
       await this.redisService.set(cacheKey, countryDetail);
       return countryDetail;
     }
 
-    throw new AppError('0001', 'Country not found');
+    throw new AppError('0001', 'Country not found', HttpStatus.NOT_FOUND);
   }
 
   async getRegionsWithPopulation(
@@ -226,17 +274,30 @@ export class CountryService {
 
     const regionDtos: RegionResponseDto[] = aggregatedRegions.map((region) => {
       region.countries.map((country) => {
-        country.nativeName = JSON.parse(
-          country.nativeName as unknown as string,
-        );
-        country.coatOfArms = JSON.parse(
-          country.coatOfArms as unknown as string,
-        );
-        country.flags = JSON.parse(country.flags as unknown as string);
-        country.currencies = JSON.parse(
-          country.currencies as unknown as string,
-        );
-        country.languages = JSON.parse(country.languages as unknown as string);
+        country.nativeName =
+          typeof country.nativeName === 'string'
+            ? JSON.parse(country.nativeName)
+            : country.nativeName;
+
+        country.coatOfArms =
+          typeof country.coatOfArms === 'string'
+            ? JSON.parse(country.coatOfArms)
+            : country.coatOfArms;
+
+        country.flags =
+          typeof country.flags === 'string'
+            ? JSON.parse(country.flags)
+            : country.flags;
+
+        country.currencies =
+          typeof country.currencies === 'string'
+            ? JSON.parse(country.currencies)
+            : country.currencies;
+
+        country.languages =
+          typeof country.languages === 'string'
+            ? JSON.parse(country.languages)
+            : country.languages;
       });
       return {
         name: region.name,

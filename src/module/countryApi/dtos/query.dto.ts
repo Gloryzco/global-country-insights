@@ -6,8 +6,9 @@ export class QueryDTO {
   @IsNumber()
   @Min(1)
   @Type(() => Number)
+  @IsOptional()
   @ApiProperty({
-    description: 'Number of pages to display',
+    description: 'Page number',
     example: 1,
     required: false,
     title: 'page',
@@ -19,6 +20,7 @@ export class QueryDTO {
   @Min(1)
   @Max(100)
   @Type(() => Number)
+  @IsOptional()
   @ApiProperty({
     description: 'Size of data per page',
     example: 10,

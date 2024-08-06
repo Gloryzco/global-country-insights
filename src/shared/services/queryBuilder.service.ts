@@ -110,7 +110,6 @@ export class QueryBuilderService {
     regions: string[] = [],
   ): Promise<RegionResponseDto[]> {
     try {
-      // Step 1: Aggregate population by region
       const aggregatedRegions = await this.countryRepository
         .createQueryBuilder('country')
         .select('country.region', 'region')
@@ -121,7 +120,6 @@ export class QueryBuilderService {
         })
         .getRawMany();
 
-      // Step 2: Get detailed country information for each region
       const regionDtos: RegionResponseDto[] = await Promise.all(
         aggregatedRegions.map(async (region) => {
           const countries = await this.countryRepository

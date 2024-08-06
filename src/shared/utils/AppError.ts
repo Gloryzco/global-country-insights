@@ -17,7 +17,6 @@ class AppError extends Error {
     this.responseBody = ResponseCodes[responseCode];
     this.responseBody = ResponseCodes[responseCode];
     this.httpStatusCode = httpStatus;
-    console.log(httpStatus, 'from constructor');
 
     Error.captureStackTrace(this, this.constructor);
   }

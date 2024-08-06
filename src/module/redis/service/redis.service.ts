@@ -64,6 +64,7 @@ export class RedisService {
   async get(
     key: string,
     keyType: string = 'countries',  // Changed default to 'cache'
+    pagination?:{page: number, limit: number}
   ): Promise<any> {
     try {
       const redisKey = `${keyType}:${key}`;
