@@ -36,12 +36,14 @@ The project is built using the following technologies:
    ```
 
 2. **Install dependencies:**
+
 ```bash
   npm install
 ```
 
 3. **Configure environment variables:**
-Create a .env file in the root directory and add the following configuration:
+   Create a .env file in the root directory and add the following configuration:
+
 ```bash
 PORT=
 DATABASE_HOST=
@@ -54,113 +56,191 @@ REDIS_PORT=
 ```
 
 4. **Run database migrations:**
+
 ```bash
 npm run migration:run
 ```
 
 5. **Start the application:**
+
 ```bash
 npm run start
 ```
 
 5. **Running Tests:**
-To run tests, use the following command:
+   To run tests, use the following command:
+
 ```bash
 npm run test
 ```
-## Endpoints
 
-1. **Get Country by Code**
-   - **Endpoint:** `GET /countries/:code`
-   - **Description:** Retrieves detailed information about a country by its code.
-   - **Parameters:**
-     - `code` (string): The 3-letter country code.
+# API Endpoints Documentation
 
-2. **Get Countries by Query**
-   - **Endpoint:** `GET /countries`
-   - **Description:** Retrieves a list of countries based on query parameters.
-   - **Parameters:**
-     - `region` (string): Filter by region.
-     - `minPopulation` (number): Minimum population filter.
-     - `maxPopulation` (number): Maximum population filter.
-     - `page` (number): Page number for pagination.
-     - `limit` (number): Number of countries per page.
+## Country Endpoints
 
-3. **Save Countries**
-   - **Endpoint:** `POST /countries`
-   - **Description:** Saves multiple country records to the database.
-   - **Request Body:** An array of country objects.
+### Retrieve a List of Countries
 
-4. **Get Regions with Population**
-   - **Endpoint:** `GET /regions`
-   - **Description:** Retrieves regions with aggregated population data.
-   - **Parameters:**
-     - `regions` (array of strings): List of region names to filter.
+- **Endpoint:** `GET /country`
+- **Description:** Retrieve a list of countries with pagination and optional filtering by region or population size.
+- **Parameters:**
+  - `region` (string): Filter by region.
+  - `minPopulation` (number): Minimum population filter.
+  - `maxPopulation` (number): Maximum population filter.
+  - `page` (number): Page number for pagination.
+  - `limit` (number): Number of countries per page.
+- **Responses:**
+  - **200 OK**
+    - **Description:** Countries fetched successfully.
+    - **Response Type:** `CountryResponseDto`
 
-5. **Get Languages with Details**
-   - **Endpoint:** `GET /languages`
-   - **Description:** Retrieves languages spoken across countries with speaker counts.
+### Retrieve a List of Regions with Countries
 
-6. **Get Total Countries**
-   - **Endpoint:** `GET /countries/total`
-   - **Description:** Retrieves the total number of countries in the database.
+- **Endpoint:** `GET /country/regions`
+- **Description:** Retrieve a list of regions and the countries within each region, with additional aggregated data such as the total population of the region.
+- **Parameters:**
+  - `regions` (array of strings): List of region names to filter.
+- **Responses:**
+  - **200 OK**
+    - **Description:** Regions fetched successfully.
+    - **Response Type:** `[RegionResponseDto]`
 
-7. **Get Largest Country by Area**
-   - **Endpoint:** `GET /countries/largest`
-   - **Description:** Retrieves the country with the largest area.
+### Retrieve a List of Languages with Details
 
-8. **Get Smallest Country by Population**
-   - **Endpoint:** `GET /countries/smallest`
-   - **Description:** Retrieves the country with the smallest population.
+- **Endpoint:** `GET /country/languages`
+- **Description:** Retrieve a list of languages with details including the countries they are spoken in and the total number of speakers globally.
+- **Responses:**
+  - **200 OK**
+    - **Description:** Language details fetched successfully.
+    - **Response Type:** `[LanguageDetail]`
 
-9. **Get Most Widely Spoken Language**
-   - **Endpoint:** `GET /languages/widely-spoken`
-   - **Description:** Retrieves the most widely spoken language by total speakers.
+### Retrieve Aggregated Statistics
 
-   Entities
-   Country
-   ID: Primary key, auto-generated.
-   cca3: 3-letter country code.
-   nameCommon: Common name of the country.
-   nameOfficial: Official name of the country.
-   nativeName: Native names in different languages.
-   cca2: 2-letter country code.
-   ccn3: Numeric country code.
-   independent: Boolean indicating if the country is independent.
-   status: Status of the country.
-   unMember: Boolean indicating UN membership.
-   currencies: Currencies used by the country.
-   idd: International dialing codes.
-   capital: Capital city names.
-   altSpellings: Alternative spellings of the country name.
-   region: Region the country belongs to.
-   languages: Languages spoken in the country.
-   translations: Translations of the country name.
-   latlng: Latitude and longitude.
-   landlocked: Boolean indicating if the country is landlocked.
-   area: Area of the country.
-   demonyms: Demonyms for the country.
-   flag: Flag URL.
-   maps: Maps URLs.
-   population: Population of the country.
-   car: Car information (e.g., signs, side).
-   timezones: Time zones.
-   continents: Continents the country is located in.
-   flags: Flag images URLs (PNG, SVG).
-   coatOfArms: Coat of arms details.
-   startOfWeek: Start of the week (e.g., Sunday, Monday).
-   capitalInfo: Capital city information.
-   Challenges and Highlights
-   Caching Strategy: Implementing efficient caching with Redis to handle large datasets and improve performance.
-   Pagination and Query Optimization: Ensuring efficient data retrieval and pagination for large datasets.
-   Analytics and Aggregations: Aggregating data for insightful analytics, such as most spoken languages and largest countries by area.
-   Areas for Improvement
-   Enhanced Caching: Implement more sophisticated caching strategies, such as cache invalidation and refreshing.
-   Extended Analytics: Add more detailed analytics and reporting features.
-   User Authentication: Implement user authentication and authorization for API access.
-   Documentation and Testing: Expand the documentation and improve test coverage for edge cases.
-   License
-   This project is licensed under the MIT License - see the LICENSE file for details.
+- **Endpoint:** `GET /country/statistics`
+- **Description:** Retrieve aggregated statistics including the total number of countries, largest country by area, smallest country by population, and most widely spoken language.
+- **Responses:**
+  - **200 OK**
+    - **Description:** Statistics fetched successfully.
+    - **Response Type:** `StatisticsDto`
+
+### Retrieve Detailed Information for a Specific Country
+
+- **Endpoint:** `GET /country/:code`
+- **Description:** Retrieve detailed information for a specific country, including its languages, population, area, and bordering countries.
+- **Parameters:**
+  - `code` (string): The 3-letter country code.
+- **Responses:**
+  - **200 OK**
+    - **Description:** Country details fetched successfully.
+    - **Response Type:** `CountryResponseDto`
+
+## Admin Endpoints
+
+### Initialize Countries
+
+- **Endpoint:** `GET /admin/initialize-countries`
+- **Description:** Retrieve all countries from the API, store them persistently in the database, and cache them in Redis for future requests.
+- **Responses:**
+  - **200 OK**
+    - **Description:** Countries initialized successfully.
+    - **Response Type:** `[CountryResponseDto]`
+
+## Authentication Endpoints
+
+### Login
+
+- **Endpoint:** `POST /auth/login`
+- **Description:** Authenticate to obtain a token for accessing the endpoints.
+- **Request Body:**
+  - `loginDto`: Credentials for login.
+- **Responses:**
+  - **200 OK**
+    - **Description:** User logged in.
+    - **Response Type:** `LoginUserResponseData`
+
+### Logout
+
+- **Endpoint:** `POST /auth/logout`
+- **Description:** Log out the user by invalidating their token.
+- **Responses:**
+  - **200 OK**
+    - **Description:** User logged out successfully.
+
+### Refresh Token
+
+- **Endpoint:** `POST /auth/refresh-token`
+- **Description:** Refresh the token to obtain a new access token.
+- **Request Body:**
+  - `refreshToken`: The refresh token.
+- **Responses:**
+  - **200 OK**
+    - **Description:** Token refreshed successfully.
+    - **Response Type:** `refreshTokenResponseData`
+  - **404 Not Found**
+    - **Description:** User record not found.
+
+## User Endpoints
+
+### Register
+
+- **Endpoint:** `POST /user/register`
+- **Description:** Register as a user to have access to the endpoints.
+- **Request Body:**
+  - `createUserDto`: User registration details.
+- **Responses:**
+  - **201 Created**
+    - **Description:** User registered successfully.
+    - **Response Type:** `CreatedUserResponseData`
+  - **400 Bad Request**
+    - **Description:** Bad request.
+
+
+   ## Entities
+
+### Country
+
+- **ID:** Primary key, auto-generated.
+- **cca3:** 3-letter country code.
+- **nameCommon:** Common name of the country.
+- **nameOfficial:** Official name of the country.
+- **nativeName:** Native names in different languages.
+- **cca2:** 2-letter country code.
+- **ccn3:** Numeric country code.
+- **independent:** Boolean indicating if the country is independent.
+- **status:** Status of the country.
+- **unMember:** Boolean indicating UN membership.
+- **currencies:** Currencies used by the country.
+- **idd:** International dialing codes.
+- **capital:** Capital city names.
+- **altSpellings:** Alternative spellings of the country name.
+- **region:** Region the country belongs to.
+- **languages:** Languages spoken in the country.
+- **translations:** Translations of the country name.
+- **latlng:** Latitude and longitude.
+- **landlocked:** Boolean indicating if the country is landlocked.
+- **area:** Area of the country.
+- **demonyms:** Demonyms for the country.
+- **flag:** Flag URL.
+- **maps:** Maps URLs.
+- **population:** Population of the country.
+- **car:** Car information (e.g., signs, side).
+- **timezones:** Time zones.
+- **continents:** Continents the country is located in.
+- **flags:** Flag images URLs (PNG, SVG).
+- **coatOfArms:** Coat of arms details.
+- **startOfWeek:** Start of the week (e.g., Sunday, Monday).
+- **capitalInfo:** Capital city information.
+
+  Challenges and Highlights
+  Caching Strategy: Implementing efficient caching with Redis to handle large datasets and improve performance.
+  Pagination and Query Optimization: Ensuring efficient data retrieval and pagination for large datasets.
+  Analytics and Aggregations: Aggregating data for insightful analytics, such as most spoken languages and largest countries by area.
+  Areas for Improvement
+  Enhanced Caching: Implement more sophisticated caching strategies, such as cache invalidation and refreshing.
+  Extended Analytics: Add more detailed analytics and reporting features.
+  User Authentication: Implement user authentication and authorization for API access.
+  Documentation and Testing: Expand the documentation and improve test coverage for edge cases.
+  License
+  This project is licensed under the MIT License - see the LICENSE file for details.
 
 Contributing
 Contributions are welcome! Please submit a pull request or open an issue for any improvements or bug fixes.
