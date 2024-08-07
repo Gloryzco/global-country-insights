@@ -32,8 +32,8 @@ import { RegionDTO } from '../dtos/region.dto';
 
 @ApiBearerAuth('JWT')
 @UseGuards(AccessTokenGuard)
-@ApiTags('Country')
-@Controller('country')
+@ApiTags('Countries')
+@Controller('countries')
 export class CountriesController {
   constructor(private readonly countryService: CountryService) {}
 
