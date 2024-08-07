@@ -10,7 +10,6 @@ COPY . .
 RUN npm install && npm run build
 
 # RUN rm -rf ./src
-RUN ./in
 
 EXPOSE 3009
 
