@@ -24,10 +24,5 @@ jobs:
             git config --global credential.helper none
             git pull origin main
             sudo docker compose up --build -d
-            until sudo docker compose logs app | grep -q "port: 6379"; do
-              sleep 5
-            done
-
-            echo "Container is ready. Running migrations..."
             sudo docker exec country_api npm run migration:run
             echo "Done"
