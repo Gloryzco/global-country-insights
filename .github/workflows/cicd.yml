@@ -19,7 +19,7 @@ jobs:
           script: |
             cd /home/ubuntu/global-country-insights
             sudo docker compose down
-            git stash
+            # git stash
             # Set git config
             git config --global credential.helper none
             git pull origin main
