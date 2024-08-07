@@ -32,7 +32,7 @@ async function bootstrap() {
           const message_key = Object.keys(validationErrors[0].constraints)[0];
           message = validationErrors[0].constraints[message_key];
         }
-        return new AppValidationError(message || 'Validation Error Occured');
+        return new AppValidationError(message || 'Validation Error Occured.');
       },
     }),
   );
