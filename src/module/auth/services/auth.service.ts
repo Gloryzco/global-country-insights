@@ -88,6 +88,7 @@ export class AuthService {
         HttpStatus.BAD_REQUEST,
       );
     }
+
     const isValidPassword = await user.verifyPassword(password, user.password);
 
     if (!isValidPassword) {
