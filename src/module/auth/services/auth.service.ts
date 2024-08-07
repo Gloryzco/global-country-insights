@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { LoginDto, RefreshTokenDto } from '../dtos';
 import * as argon from 'argon2';
@@ -82,12 +82,20 @@ export class AuthService {
     const { email, password } = loginDto;
     const user = await this.userService.findByEmail(email);
     if (!user) {
-      throw new AppError('0001', 'User not found');
+      throw new AppError(
+        '0003',
+        'user not found or invalid credentials',
+        HttpStatus.BAD_REQUEST,
+      );
     }
     const isValidPassword = await user.verifyPassword(password, user.password);
 
     if (!isValidPassword) {
-      throw new AppError('0003', 'invalid credentials');
+      throw new AppError(
+        '0003',
+        'user not found or invalid credentials',
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
     const accessTokenDetails = await this.generateAccessToken(

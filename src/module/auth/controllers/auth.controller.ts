@@ -1,6 +1,7 @@
 import { Controller, Body, Response, Post, UseGuards } from '@nestjs/common';
 
 import {
+  ApiBadRequestResponse,
   ApiBearerAuth,
   ApiNotFoundResponse,
   ApiOkResponse,
@@ -26,6 +27,10 @@ export class AuthController {
   @ApiOperation({ summary: 'Authenticate to obtain a token for accessing the endpoints.' })
   @ApiOkResponse({
     description: 'User logged in',
+    type: LoginUserResponseData,
+  })
+  @ApiBadRequestResponse({
+    description: 'User does not exist',
     type: LoginUserResponseData,
   })
   @Post('login')
