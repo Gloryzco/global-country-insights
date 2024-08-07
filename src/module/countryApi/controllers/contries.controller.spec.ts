@@ -3,8 +3,9 @@ import { CountriesController } from './countries.controller';
 import { CountryService } from '../services';
 import { QueryDTO, CodeDTO } from '../dtos';
 import { ResponseFormat } from 'src/shared';
-import { HttpStatus } from '@nestjs/common';
+import { ExecutionContext, HttpStatus } from '@nestjs/common';
 import { RegionDTO } from '../dtos/region.dto';
+import { AccessTokenGuard } from 'src/shared/guards';
 
 describe('CountriesController', () => {
   let countriesController: CountriesController;
@@ -22,7 +23,7 @@ describe('CountriesController', () => {
     status: jest.fn().mockReturnThis(),
     json: jest.fn().mockReturnThis(),
   };
-
+  const mockUserId = 'userId';
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [CountriesController],
@@ -32,7 +33,16 @@ describe('CountriesController', () => {
           useValue: mockCountryService,
         },
       ],
-    }).compile();
+    })
+      .overrideGuard(AccessTokenGuard)
+      .useValue({
+        canActivate: jest.fn((context: ExecutionContext) => {
+          const req = context.switchToHttp().getRequest();
+          req.user['sub'] = mockUserId;
+          return true;
+        }),
+      })
+      .compile();
 
     countriesController = module.get<CountriesController>(CountriesController);
     countryService = module.get<CountryService>(CountryService);

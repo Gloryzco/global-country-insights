@@ -3,6 +3,7 @@ import { AdminController } from './admin.controller';
 import { CountryService } from 'src/module/countryApi';
 import { ResponseFormat } from 'src/shared';
 import { HttpStatus } from '@nestjs/common';
+import { AccessTokenGuard } from 'src/shared/guards';
 
 describe('AdminController', () => {
   let adminController: AdminController;
@@ -26,7 +27,12 @@ describe('AdminController', () => {
           useValue: mockCountryService,
         },
       ],
-    }).compile();
+    })
+    .overrideGuard(AccessTokenGuard) 
+    .useValue({
+      canActivate: jest.fn(() => true), 
+    })
+    .compile();
 
     adminController = module.get<AdminController>(AdminController);
     countryService = module.get<CountryService>(CountryService);
@@ -53,7 +59,7 @@ describe('AdminController', () => {
       expect(responseSpy).toHaveBeenCalledWith(
         mockResponse,
         countries,
-        'Countries Persisted Successfully',
+        'Countries fetched Successfully',
         HttpStatus.OK,
       );
     });
