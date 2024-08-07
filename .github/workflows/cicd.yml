@@ -1,0 +1,27 @@
+on:
+  push:
+    branches: 
+      - main
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:        
+    - name: Checkout code
+      uses: actions/checkout@v3
+      with:
+        ref: main
+    - name: SSH into server
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.PRIVATE_KEY }}
+        script: |      
+          cd /home/ubuntu/global-country-insights
+          docker compose down
+          git stash
+          # Set git config
+          git config --global credential.helper none
+          git pull origin main
+          docker compose up --build -d
+          echo "Done"
