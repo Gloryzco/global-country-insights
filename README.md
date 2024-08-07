@@ -68,48 +68,55 @@ To run tests, use the following command:
 ```bash
 npm run test
 ```
-
 ## Endpoints
 
-1. Get Country by Code
-   Endpoint: GET /countries/:code
-   Description: Retrieves detailed information about a country by its code.
-   Parameters:
-   code (string): The 3-letter country code.
-2. Get Countries by Query
-   Endpoint: GET /countries
-   Description: Retrieves a list of countries based on query parameters.
-   Parameters:
-   region (string): Filter by region.
-   minPopulation (number): Minimum population filter.
-   maxPopulation (number): Maximum population filter.
-   page (number): Page number for pagination.
-   limit (number): Number of countries per page.
-3. Save Countries
-   Endpoint: POST /countries
-   Description: Saves multiple country records to the database.
-   Request Body:
-   An array of country objects.
-4. Get Regions with Population
-   Endpoint: GET /regions
-   Description: Retrieves regions with aggregated population data.
-   Parameters:
-   regions (array of strings): List of region names to filter.
-5. Get Languages with Details
-   Endpoint: GET /languages
-   Description: Retrieves languages spoken across countries with speaker counts.
-6. Get Total Countries
-   Endpoint: GET /countries/total
-   Description: Retrieves the total number of countries in the database.
-7. Get Largest Country by Area
-   Endpoint: GET /countries/largest
-   Description: Retrieves the country with the largest area.
-8. Get Smallest Country by Population
-   Endpoint: GET /countries/smallest
-   Description: Retrieves the country with the smallest population.
-9. Get Most Widely Spoken Language
-   Endpoint: GET /languages/widely-spoken
-   Description: Retrieves the most widely spoken language by total speakers.
+1. **Get Country by Code**
+   - **Endpoint:** `GET /countries/:code`
+   - **Description:** Retrieves detailed information about a country by its code.
+   - **Parameters:**
+     - `code` (string): The 3-letter country code.
+
+2. **Get Countries by Query**
+   - **Endpoint:** `GET /countries`
+   - **Description:** Retrieves a list of countries based on query parameters.
+   - **Parameters:**
+     - `region` (string): Filter by region.
+     - `minPopulation` (number): Minimum population filter.
+     - `maxPopulation` (number): Maximum population filter.
+     - `page` (number): Page number for pagination.
+     - `limit` (number): Number of countries per page.
+
+3. **Save Countries**
+   - **Endpoint:** `POST /countries`
+   - **Description:** Saves multiple country records to the database.
+   - **Request Body:** An array of country objects.
+
+4. **Get Regions with Population**
+   - **Endpoint:** `GET /regions`
+   - **Description:** Retrieves regions with aggregated population data.
+   - **Parameters:**
+     - `regions` (array of strings): List of region names to filter.
+
+5. **Get Languages with Details**
+   - **Endpoint:** `GET /languages`
+   - **Description:** Retrieves languages spoken across countries with speaker counts.
+
+6. **Get Total Countries**
+   - **Endpoint:** `GET /countries/total`
+   - **Description:** Retrieves the total number of countries in the database.
+
+7. **Get Largest Country by Area**
+   - **Endpoint:** `GET /countries/largest`
+   - **Description:** Retrieves the country with the largest area.
+
+8. **Get Smallest Country by Population**
+   - **Endpoint:** `GET /countries/smallest`
+   - **Description:** Retrieves the country with the smallest population.
+
+9. **Get Most Widely Spoken Language**
+   - **Endpoint:** `GET /languages/widely-spoken`
+   - **Description:** Retrieves the most widely spoken language by total speakers.
+
    Entities
    Country
    ID: Primary key, auto-generated.
