@@ -14,7 +14,7 @@ describe('CountriesController', () => {
     getCountries: jest.fn(),
     getRegionsWithPopulation: jest.fn(),
     getLanguagesWithDetails: jest.fn(),
-    getStatistics: jest.fn(),
+    getCountryStatistics: jest.fn(),
     getCountryDetailbyCode: jest.fn(),
   };
 
@@ -46,7 +46,7 @@ describe('CountriesController', () => {
     it('should fetch countries and return success response', async () => {
       const queryDto: QueryDTO = { region: 'Europe', minPopulation: 1000000 };
       const countries = [{ name: 'France', population: 67000000 }];
-      
+
       mockCountryService.getCountries.mockResolvedValue(countries);
       const responseSpy = jest.spyOn(ResponseFormat, 'successResponse');
 
@@ -67,12 +67,19 @@ describe('CountriesController', () => {
       const regionDTO: RegionDTO = { regions: 'Europe' };
       const regionsData = [{ region: 'Europe', totalPopulation: 500000000 }];
 
-      mockCountryService.getRegionsWithPopulation.mockResolvedValue(regionsData);
+      mockCountryService.getRegionsWithPopulation.mockResolvedValue(
+        regionsData,
+      );
       const responseSpy = jest.spyOn(ResponseFormat, 'successResponse');
 
-      await countriesController.getRegionsWithCountries(regionDTO, mockResponse);
+      await countriesController.getRegionsWithCountries(
+        regionDTO,
+        mockResponse,
+      );
 
-      expect(countryService.getRegionsWithPopulation).toHaveBeenCalledWith(regionDTO);
+      expect(countryService.getRegionsWithPopulation).toHaveBeenCalledWith(
+        regionDTO,
+      );
       expect(responseSpy).toHaveBeenCalledWith(
         mockResponse,
         regionsData,
@@ -85,10 +92,12 @@ describe('CountriesController', () => {
   describe('getLanguages', () => {
     it('should fetch languages with details and return success response', async () => {
       const languagesData = [
-        { language: 'English', countries: ['USA', 'UK'], speakers: 1500000000 }
+        { language: 'English', countries: ['USA', 'UK'], speakers: 1500000000 },
       ];
 
-      mockCountryService.getLanguagesWithDetails.mockResolvedValue(languagesData);
+      mockCountryService.getLanguagesWithDetails.mockResolvedValue(
+        languagesData,
+      );
       const responseSpy = jest.spyOn(ResponseFormat, 'successResponse');
 
       await countriesController.getLanguages(mockResponse);
@@ -103,7 +112,7 @@ describe('CountriesController', () => {
     });
   });
 
-  describe('getStatistics', () => {
+  describe('getCountryStatistics', () => {
     it('should fetch statistics and return success response', async () => {
       const statisticsData = {
         totalCountries: 195,
@@ -112,12 +121,12 @@ describe('CountriesController', () => {
         mostSpokenLanguage: 'English',
       };
 
-      mockCountryService.getStatistics.mockResolvedValue(statisticsData);
+      mockCountryService.getCountryStatistics.mockResolvedValue(statisticsData);
       const responseSpy = jest.spyOn(ResponseFormat, 'successResponse');
 
-      await countriesController.getStatistics(mockResponse);
+      await countriesController.getCountryStatistics(mockResponse);
 
-      expect(countryService.getStatistics).toHaveBeenCalled();
+      expect(countryService.getCountryStatistics).toHaveBeenCalled();
       expect(responseSpy).toHaveBeenCalledWith(
         mockResponse,
         statisticsData,
@@ -130,14 +139,22 @@ describe('CountriesController', () => {
   describe('getCountryDetail', () => {
     it('should fetch country detail by code and return success response', async () => {
       const codeDto: CodeDTO = { code: 'US' };
-      const countryDetail = { code: 'US', name: 'United States', population: 331000000 };
+      const countryDetail = {
+        code: 'US',
+        name: 'United States',
+        population: 331000000,
+      };
 
-      mockCountryService.getCountryDetailbyCode.mockResolvedValue(countryDetail);
+      mockCountryService.getCountryDetailbyCode.mockResolvedValue(
+        countryDetail,
+      );
       const responseSpy = jest.spyOn(ResponseFormat, 'successResponse');
 
       await countriesController.getCountryDetail(codeDto, mockResponse);
 
-      expect(countryService.getCountryDetailbyCode).toHaveBeenCalledWith(codeDto);
+      expect(countryService.getCountryDetailbyCode).toHaveBeenCalledWith(
+        codeDto,
+      );
       expect(responseSpy).toHaveBeenCalledWith(
         mockResponse,
         countryDetail,

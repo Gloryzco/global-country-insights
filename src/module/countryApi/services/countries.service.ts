@@ -324,7 +324,7 @@ export class CountryService {
     return languages;
   }
 
-  async getStatistics(): Promise<StatisticsDto> {
+  async getCountryStatistics(): Promise<StatisticsDto> {
     const cacheKey = 'statistics';
 
     let statistics = await this.redisService.get(cacheKey);

@@ -1,8 +1,11 @@
-import { Controller, HttpStatus, Post, Response } from '@nestjs/common';
-import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Controller, HttpStatus, Post, Response, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CountryResponseDto, CountryService } from 'src/module/countryApi';
 import { ResponseFormat, withPaginatedResponse } from 'src/shared';
+import { AccessTokenGuard } from 'src/shared/guards';
 
+@ApiBearerAuth('JWT')
+@UseGuards(AccessTokenGuard)
 @ApiTags('Admin')
 @Controller('admin')
 export class AdminController {

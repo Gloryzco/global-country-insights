@@ -22,4 +22,19 @@ export class AxiosHelper {
       status: response.status,
     };
   }
+
+  static async sendPostRequest(
+    data: any,
+    path: string,
+  ): Promise<IAxiosHelperResponse> {
+    const response = await axios.post(path, data, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    return {
+      data: response.data,
+      status: response.status,
+    };
+  }
 }

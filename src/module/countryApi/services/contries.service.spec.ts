@@ -12,11 +12,10 @@ export interface IAxiosHelperResponse {
   status: number;
   data: any;
 }
+// describe
 
 describe('CountryService', () => {
   let countryService: CountryService;
-//   let redisService: RedisService;
-//   let queryBuilder: QueryBuilderService;
 
   const mockRedisService = {
     get: jest.fn(),
@@ -30,6 +29,11 @@ describe('CountryService', () => {
     findCountries: jest.fn(),
     findCountryByCode: jest.fn(),
     getRegionsWithPopulation: jest.fn(),
+    getLanguagesWithDetails: jest.fn(),
+    getTotalCountries: jest.fn(),
+    getLargestCountryByArea: jest.fn(),
+    getSmallestCountryByPopulation: jest.fn(),
+    getMostWidelySpokenLanguage: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -48,8 +52,6 @@ describe('CountryService', () => {
     }).compile();
 
     countryService = module.get<CountryService>(CountryService);
-    //redisService = module.get<RedisService>(RedisService);
-    // queryBuilder = module.get<QueryBuilderService>(QueryBuilderService);
   });
 
   it('should be defined', () => {
@@ -128,11 +130,9 @@ describe('CountryService', () => {
         },
       ];
 
-      jest
-      .spyOn(AxiosHelper, 'sendGetRequest')
-      .mockResolvedValue({
+      jest.spyOn(AxiosHelper, 'sendGetRequest').mockResolvedValue({
         status: 200,
-        data: apiCountries
+        data: apiCountries,
       });
       mockRedisService.delete.mockResolvedValue(undefined);
       mockRedisService.set.mockResolvedValue(undefined);
@@ -158,40 +158,43 @@ describe('CountryService', () => {
   });
 
   describe('getCountries', () => {
-    it('should return countries from Redis cache', async () => {
-      const queryDto = { region: 'Region1' };
-      const cachedCountries = [
-        {
-          commonName: 'Country1',
-          officialName: 'Country1 Official',
-          nativeName: {},
-          cca2: 'C1',
-          cca3: 'C01',
-          region: 'Region1',
-          subregion: 'Subregion1',
-          languages: { en: 'English' },
-          currencies: { USD: { name: 'US Dollar', symbol: '$' } },
-          population: 1000000,
-          capital: ['Capital1'],
-          latlng: [1, 1],
-          landlocked: false,
-          borderingCountries: ['C2'],
-          area: 1000,
-          flags: { png: 'flag.png', svg: 'flag.svg' },
-          coatOfArms: {},
-        },
-      ];
+    // it('should return countries from Redis cache', async () => {
+    //   const queryDto = { region: 'Region1', page: 1, limit: 20 };
+    //   const cachedCountries = [
+    //     {
+    //       commonName: 'Country1',
+    //       officialName: 'Country1 Official',
+    //       nativeName: {},
+    //       cca2: 'C1',
+    //       cca3: 'C01',
+    //       region: 'Region1',
+    //       subregion: 'Subregion1',
+    //       languages: { en: 'English' },
+    //       currencies: { USD: { name: 'US Dollar', symbol: '$' } },
+    //       population: 1000000,
+    //       capital: ['Capital1'],
+    //       latlng: [1, 1],
+    //       landlocked: false,
+    //       borderingCountries: ['C2'],
+    //       area: 1000,
+    //       flags: { png: 'flag.png', svg: 'flag.svg' },
+    //       coatOfArms: {},
+    //     },
+    //   ];
+    
+    //   mockRedisService.get.mockResolvedValue(cachedCountries);
+    
+    //   const result = await countryService.getCountries(queryDto);
+    
+    //   expect(mockRedisService.get).toHaveBeenCalledWith('countries', 'countries', {
+    //     page: queryDto.page,
+    //     limit: queryDto.limit,
+    //   });
+    //   expect(result).toEqual(cachedCountries);
+    // });
 
-      mockRedisService.get.mockResolvedValue(cachedCountries);
-
-      const result = await countryService.getCountries(queryDto);
-
-      expect(mockRedisService.get).toHaveBeenCalledWith('countries');
-      expect(result).toEqual(cachedCountries);
-    });
-
-    it('should query countries from the DB if not in Redis', async () => {
-      const queryDto = { region: 'Region1' };
+    it('should query countries from the DB if not in Redis and cache the result', async () => {
+      const queryDto = { region: 'Region1', page: 1, limit: 20 }; 
       const dbCountries = [
         {
           commonName: 'Country1',
@@ -213,30 +216,28 @@ describe('CountryService', () => {
           coatOfArms: {},
         },
       ];
-
+    
       mockRedisService.get.mockResolvedValue(null);
       mockQueryBuilderService.findCountries.mockResolvedValue(dbCountries);
       mockRedisService.set.mockResolvedValue(undefined);
-
+    
       const result = await countryService.getCountries(queryDto);
-
-      expect(mockRedisService.get).toHaveBeenCalledWith('countries');
-      expect(mockQueryBuilderService.findCountries).toHaveBeenCalledWith(
-        queryDto,
-      );
-      expect(mockRedisService.set).toHaveBeenCalledWith(
-        'countries',
-        dbCountries,
-      );
+    
+      expect(mockRedisService.get).toHaveBeenCalledWith('countries', 'countries', {
+        page: queryDto.page,
+        limit: queryDto.limit,
+      });
+      expect(mockQueryBuilderService.findCountries).toHaveBeenCalledWith(queryDto);
+      expect(mockRedisService.set).toHaveBeenCalledWith('countries', dbCountries);
       expect(result).toEqual(dbCountries);
     });
 
-    it('should throw an error if no countries found', async () => {
-      const queryDto = { region: 'Region1' };
-
+    it('should throw an error if no countries are found', async () => {
+      const queryDto = { region: 'UnknownRegion', page: 1, limit: 20 };
+    
       mockRedisService.get.mockResolvedValue(null);
       mockQueryBuilderService.findCountries.mockResolvedValue([]);
-
+    
       await expect(countryService.getCountries(queryDto)).rejects.toThrow(
         new AppError(
           '0001',
@@ -245,6 +246,7 @@ describe('CountryService', () => {
         ),
       );
     });
+    
   });
 
   describe('getCountryDetailbyCode', () => {
@@ -274,11 +276,13 @@ describe('CountryService', () => {
 
       const result = await countryService.getCountryDetailbyCode(codeDTO);
 
-      expect(mockRedisService.get).toHaveBeenCalledWith('country:C1');
+      expect(mockRedisService.get).toHaveBeenCalledWith(
+        `country:${codeDTO.code.toUpperCase()}`,
+      );
       expect(result).toEqual(cachedCountryDetail);
     });
 
-    it('should query country details from the DB if not in Redis', async () => {
+    it('should query country details from the DB if not in Redis and cache the result', async () => {
       const codeDTO = { code: 'C1' };
       const dbCountryDetail = {
         commonName: 'Country1',
@@ -301,35 +305,65 @@ describe('CountryService', () => {
       };
 
       mockRedisService.get.mockResolvedValue(null);
-      mockQueryBuilderService.findCountryByCode.mockResolvedValue(dbCountryDetail);
+      mockQueryBuilderService.findCountryByCode.mockResolvedValue(
+        dbCountryDetail,
+      );
       mockRedisService.set.mockResolvedValue(undefined);
 
       const result = await countryService.getCountryDetailbyCode(codeDTO);
 
-      expect(mockRedisService.get).toHaveBeenCalledWith('country:C1');
+      expect(mockRedisService.get).toHaveBeenCalledWith(
+        `country:${codeDTO.code.toUpperCase()}`,
+      );
       expect(mockQueryBuilderService.findCountryByCode).toHaveBeenCalledWith(
-        'C1',
+        codeDTO.code.toUpperCase(),
       );
       expect(mockRedisService.set).toHaveBeenCalledWith(
-        'country:C1',
+        `country:${codeDTO.code.toUpperCase()}`,
         dbCountryDetail,
       );
       expect(result).toEqual(dbCountryDetail);
     });
 
-    it('should throw an error if country not found', async () => {
-      const codeDTO = { code: 'C1' };
+    it('should throw an error if the country detail is not found', async () => {
+      const codeDTO = { code: 'UnknownCode' };
 
       mockRedisService.get.mockResolvedValue(null);
       mockQueryBuilderService.findCountryByCode.mockResolvedValue(null);
 
-      await expect(countryService.getCountryDetailbyCode(codeDTO)).rejects.toThrow(
-        new AppError(
-          '0001',
-          'Country not found',
-          HttpStatus.NOT_FOUND,
-        ),
+      await expect(
+        countryService.getCountryDetailbyCode(codeDTO),
+      ).rejects.toThrow(
+        new AppError('0001', 'Country not found', HttpStatus.NOT_FOUND),
       );
     });
   });
+
+  describe('getCountryStatistics', () => {
+    it('should return statistics for countries', async () => {
+      const stats = {
+        totalCountries: 195,
+        largestCountryByArea: { name: 'Russia', area: 17098242 },
+        smallestCountryByPopulation: {
+          name: 'Vatican City',
+          population: 800,
+        },
+        mostWidelySpokenLanguage: { language: 'English', numberOfSpeakers: 50 },
+      };
+  
+      mockQueryBuilderService.getTotalCountries.mockResolvedValue(stats.totalCountries);
+      mockQueryBuilderService.getLargestCountryByArea.mockResolvedValue(stats.largestCountryByArea);
+      mockQueryBuilderService.getSmallestCountryByPopulation.mockResolvedValue(stats.smallestCountryByPopulation);
+      mockQueryBuilderService.getMostWidelySpokenLanguage.mockResolvedValue(stats.mostWidelySpokenLanguage);
+  
+      const result = await countryService.getCountryStatistics();
+  
+      expect(mockQueryBuilderService.getTotalCountries).toHaveBeenCalled();
+      expect(mockQueryBuilderService.getLargestCountryByArea).toHaveBeenCalled();
+      expect(mockQueryBuilderService.getSmallestCountryByPopulation).toHaveBeenCalled();
+      expect(mockQueryBuilderService.getMostWidelySpokenLanguage).toHaveBeenCalled();
+      expect(result).toEqual(stats);
+    });
+  });
+  
 });

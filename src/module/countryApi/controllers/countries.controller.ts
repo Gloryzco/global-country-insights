@@ -30,8 +30,8 @@ import {
 import { CountryService } from '../services';
 import { RegionDTO } from '../dtos/region.dto';
 
-// @ApiBearerAuth('JWT')
-// @UseGuards(AccessTokenGuard)
+@ApiBearerAuth('JWT')
+@UseGuards(AccessTokenGuard)
 @ApiTags('Country')
 @Controller('country')
 export class CountriesController {
@@ -144,8 +144,8 @@ export class CountriesController {
       'Retrieve aggregated statistics including total number of countries, largest country by area, smallest country by population, and most widely spoken language.',
   })
   @Get('statistics')
-  async getStatistics(@Response() res) {
-    const statisticsData = await this.countryService.getStatistics();
+  async getCountryStatistics(@Response() res) {
+    const statisticsData = await this.countryService.getCountryStatistics();
     return ResponseFormat.successResponse(
       res,
       statisticsData,
