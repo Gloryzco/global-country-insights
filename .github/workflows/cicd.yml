@@ -24,5 +24,18 @@ jobs:
             git config --global credential.helper none
             git pull origin main
             sudo docker compose up --build -d
-            sudo docker exec country_api npm run migration:run
+            # Wait for the container to be fully up
+            echo "Waiting for container to be ready..."
+            sleep 30
+
+            # Check if the container is running
+            if sudo docker ps | grep -q "country_api"; then
+              echo "Container is running. Running migrations..."
+              sudo docker exec country_api npm run migration:run
+            else
+              echo "Error: Container is not running."
+              exit 1
+            fi
+
+            echo "Deployment completed successfully."
             echo "Done"
