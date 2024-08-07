@@ -238,9 +238,9 @@ npm run test
   - **Concurrency Management:** Addressing the challenge of handling concurrent requests was another highlight. By employing async processing and optimizing our database access patterns, I ensured that the API could handle high levels of traffic gracefully, which was critical for maintaining reliability.
 
 - **Error Handling and Global Exception Management:**
+
   - **Error Handling:** I implemented a robust error-handling strategy to manage different types of errors gracefully. This involved defining clear error codes and messages, ensuring that users received meaningful feedback. Handling validation errors, database errors, and external service failures with appropriate responses was critical for maintaining a reliable API.
   - **Global Exception Handling:** To ensure consistent error handling across the application, I set up global exception handling. This approach allowed me to catch and manage unexpected errors centrally, providing a unified response format and logging detailed error information for debugging purposes. It was essential for maintaining API stability and enhancing user experience.
-
 
 - **Analytics, Aggregations, and Data Management:**
 
@@ -253,6 +253,7 @@ npm run test
   - **HTTPS Enforcement:** Enforcing HTTPS was a critical decision to ensure secure communication and data protection.
 
 - **Documentation and Testing:**
+
   - **Expanded Documentation:** I took pride in expanding our API documentation to provide detailed endpoint descriptions and practical examples. Making sure that our API was well-documented was important for both current and future developers working with it.
   - **Unit Testing:** I used Jest for unit testing, focusing on mocking to ensure that each component was tested in isolation. This approach allowed me to confidently verify the functionality of our endpoints and improve overall code quality.
 
@@ -263,13 +264,14 @@ npm run test
 ## Aspects I am Particularly Proud Of 💪😊
 
 - **Optimized Performance:** The performance improvements achieved through caching and query optimization were incredibly satisfying. Witnessing the API's enhanced speed and efficiency was a testament to the hard work put into these optimizations.
-- **Robust Security:** Implementing strong security measures and ensuring HTTPS enforcement were crucial. I’m proud of the fact that our API is well-protected against common threats and vulnerabilities.
-- **Efficient Data Management:** The effective handling of large datasets and concurrent requests demonstrated our ability to build scalable and reliable systems. It was rewarding to see the smooth operation under high load conditions.
+- **Robust Security:** Implementing strong security measures and ensuring HTTPS enforcement were crucial. I’m proud of the fact that the API is well-protected against common threats and vulnerabilities.
+- **Efficient Data Management:** I effective handled of large datasets and concurrent requests demonstrated our ability to build scalable and reliable systems. It was rewarding to see the smooth operation under high load conditions.
 
 ## Potential Improvements and Additional Features to improve the overall API 🤞
 
 - **Advanced Analytics:** If time allowed, I would love to explore more advanced analytics features. Detailed reporting and deeper insights could provide even greater value to our users and enhance the overall functionality of the API.
 - **Enhanced Caching Mechanisms:** I envision implementing more sophisticated caching strategies, such as cache invalidation and refreshing. These improvements would further optimize performance and ensure data accuracy.
+- **Permissions for admin users:** This will be to allow only admin users only to have access to the admin routes
 - **Expanded Documentation and Testing:** I plan to continue enhancing our documentation and increasing test coverage to cover more edge cases and ensure comprehensive functionality. Also, I was unable to perfect the integration testing and it is one of the improvement I would like to look into if time permits me. This ongoing effort would ensure that our API remains reliable and user-friendly.
 
 Contributing

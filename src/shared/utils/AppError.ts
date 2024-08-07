@@ -31,7 +31,8 @@ class AppError extends Error {
         if (this.responseBody.code == '01') {
           return this.httpStatusCode ?? 202;
         }
-
+      case 'UNAUTHORIZED':
+        return this.httpStatusCode ?? 401;
       case 'FAIL':
         if (this.responseBody.code == '01') {
           return this.httpStatusCode ?? 404;
@@ -44,11 +45,9 @@ class AppError extends Error {
         if (this.responseBody.code == '05') {
           return this.httpStatusCode ?? 401;
         }
-        console.log(this.httpStatusCode);
         return this.httpStatusCode ?? 400;
 
       case 'DENIED':
-        console.log(this.httpStatusCode);
         return this.httpStatusCode ?? 400;
 
       default:

@@ -1,5 +1,5 @@
 import { Controller, Get, HttpStatus, Response, UseGuards } from '@nestjs/common';
-import { ApiBadRequestResponse, ApiBearerAuth, ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiBearerAuth, ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { CountryResponseDto, CountryService } from 'src/module/countryApi';
 import { ResponseFormat, withPaginatedResponse } from 'src/shared';
 import { AccessTokenGuard } from 'src/shared/guards';
@@ -11,6 +11,10 @@ import { AccessTokenGuard } from 'src/shared/guards';
 export class AdminController {
   constructor(private readonly countryService: CountryService) {}
 
+  @ApiUnauthorizedResponse({
+    status: 401,
+    description: 'Unauthorized',
+  })
   @ApiOkResponse({
     description: 'Successful',
     type: [CountryResponseDto],

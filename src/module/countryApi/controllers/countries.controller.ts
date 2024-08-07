@@ -15,6 +15,7 @@ import {
   ApiOkResponse,
   ApiOperation,
   ApiTags,
+  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { ResponseFormat, withPaginatedResponse } from 'src/shared';
 import { AccessTokenGuard } from 'src/shared/guards';
@@ -37,6 +38,10 @@ import { RegionDTO } from '../dtos/region.dto';
 export class CountriesController {
   constructor(private readonly countryService: CountryService) {}
 
+  @ApiUnauthorizedResponse({
+    status: 401,
+    description: 'Unauthorized',
+  })
   @ApiBadRequestResponse({
     status: 400,
     description: 'Bad request',
@@ -68,6 +73,10 @@ export class CountriesController {
     );
   }
 
+  @ApiUnauthorizedResponse({
+    status: 401,
+    description: 'Unauthorized',
+  })
   @ApiBadRequestResponse({
     status: 400,
     description: 'Bad request',
@@ -100,6 +109,10 @@ export class CountriesController {
     );
   }
 
+  @ApiUnauthorizedResponse({
+    status: 401,
+    description: 'Unauthorized',
+  })
   @ApiBadRequestResponse({
     status: 400,
     description: 'Bad request',
@@ -127,6 +140,10 @@ export class CountriesController {
     );
   }
 
+  @ApiUnauthorizedResponse({
+    status: 401,
+    description: 'Unauthorized',
+  })
   @ApiBadRequestResponse({
     status: 400,
     description: 'Bad request',
@@ -154,6 +171,10 @@ export class CountriesController {
     );
   }
 
+  @ApiUnauthorizedResponse({
+    status: 401,
+    description: 'Unauthorized',
+  })
   @ApiBadRequestResponse({
     status: 400,
     description: 'Bad request',
@@ -175,7 +196,8 @@ export class CountriesController {
     @Query() code: CodeDTO,
     @Response() res,
   ): Promise<ResponseFormat> {
-    const countryDetail = await this.countryService.getCountryDetailbyCode(code);
+    const countryDetail =
+      await this.countryService.getCountryDetailbyCode(code);
     return ResponseFormat.successResponse(
       res,
       countryDetail,

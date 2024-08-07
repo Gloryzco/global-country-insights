@@ -6,6 +6,7 @@ import {
   ApiOkResponse,
   ApiOperation,
   ApiTags,
+  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { LoginDto, RefreshTokenDto } from '../dtos';
 import { AuthService } from '../services';
@@ -35,6 +36,10 @@ export class AuthController {
 
   @ApiBearerAuth('JWT')
   @UseGuards(AccessTokenGuard)
+  @ApiUnauthorizedResponse({
+    status: 401,
+    description: 'Unauthorized',
+  })
   @ApiOkResponse({
     description: 'Logged out successfully',
   })
@@ -49,6 +54,10 @@ export class AuthController {
 
   @ApiBearerAuth('JWT')
   @UseGuards(AccessTokenGuard)
+  @ApiUnauthorizedResponse({
+    status: 401,
+    description: 'Unauthorized',
+  })
   @ApiOkResponse({
     description: 'Token refreshed successfully',
     type: refreshTokenResponseData,
