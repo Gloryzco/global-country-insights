@@ -32,35 +32,44 @@ The project is built using the following technologies:
 1. **Clone the repository:**
 
    ```bash
-   git clone https://github.com/yourusername/country-insights-api.git
-   cd country-insights-api
+   git clone https://github.com/Gloryzco/global-country-insights.git
    ```
 
-   Install dependencies:
-   npm install
+2. **Install dependencies:**
+```bash
+  npm install
+```
 
-Configure environment variables:
+3. **Configure environment variables:**
 Create a .env file in the root directory and add the following configuration:
-PORT=3000
-DATABASE_HOST=localhost
-DATABASE_PORT=3306
-DATABASE_USER=root
-DATABASE_PASSWORD=password
-DATABASE_NAME=countries
-REDIS_HOST=localhost
-REDIS_PORT=6379
+```bash
+PORT=
+DATABASE_HOST=
+DATABASE_PORT=
+DATABASE_USER=
+DATABASE_PASSWORD=
+DATABASE_NAME=
+REDIS_HOST=
+REDIS_PORT=
+```
 
-Run database migrations:
-npm run typeorm migration:run
+4. **Run database migrations:**
+```bash
+npm run migration:run
+```
 
-Start the application:
+5. **Start the application:**
+```bash
 npm run start
+```
 
-Running Tests
+5. **Running Tests:**
 To run tests, use the following command:
+```bash
 npm run test
+```
 
-Endpoints
+## Endpoints
 
 1. Get Country by Code
    Endpoint: GET /countries/:code
