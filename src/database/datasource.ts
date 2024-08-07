@@ -4,7 +4,7 @@ import configuration from 'src/config/configuration';
 const config = configuration();
 
 export const dataSourceOptions: DataSourceOptions = {
-  type: config.db.type as 'mysql' | 'postgres' | 'sqlite' | 'mariadb' | 'oracle' | 'mssql' | 'mongodb',
+  type: 'mysql',
   host: config.db.host || '127.0.0.1',
   port: parseInt(config.db.port) || 3307,
   username: config.db.username || 'root',

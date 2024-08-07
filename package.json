@@ -19,7 +19,7 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "migration:generate": "typeorm migration:generate -d ./dist/src/database/datasource.js",
-    "migration:run": "npm run build && typeorm migration:run  -d ./dist/src/database/datasource.js",
+    "migration:run": "typeorm migration:run  -d ./dist/src/database/datasource.js",
     "migration:revert": "typeorm migration:revert -d ./dist/src/database/datasource.js",
     "migration:show": "typeorm migration:show -d ./dist/src/database/datasource.js",
     "typeorm": "typeorm-ts-node-commonjs"

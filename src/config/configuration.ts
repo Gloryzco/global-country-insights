@@ -17,7 +17,7 @@ export default () => ({
   },
 
   db: {
-    type: config.get<string>('DB_TYPE'),
+    type: config.get<string>('DB_TYPE') || 'mysql',
     host: config.get<string>('DB_HOST'),
     port: config.get<string>('DB_PORT'),
     username: config.get<string>('DB_USER'),

@@ -7,7 +7,7 @@ COPY package*.json ./
 
 COPY . .
 
-RUN npm install && npm run migration:run
+RUN npm install && npm run build
 
 # RUN rm -rf ./src
 
