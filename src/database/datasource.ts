@@ -5,8 +5,8 @@ const config = configuration();
 
 export const dataSourceOptions: DataSourceOptions = {
   type: config.db.type as any,
-  host: config.db.host || 'mysql',
-  port: parseInt(config.db.port) || 3306,
+  host: config.db.host || '127.0.0.1',
+  port: parseInt(config.db.port) || 3307,
   username: config.db.username || 'root',
   password: config.db.password || '',
   database: config.db.database || 'country_api',
