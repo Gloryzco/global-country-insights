@@ -24,5 +24,5 @@ jobs:
             git config --global credential.helper none
             git pull origin main
             sudo docker compose up --build -d
-            sudo docker exec -it country_api npm run migration:run
+            sudo docker exec country_api npm run migration:run
             echo "Done"
