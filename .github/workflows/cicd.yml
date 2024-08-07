@@ -19,10 +19,11 @@ jobs:
           script: |
             cd /home/ubuntu/global-country-insights
             sudo docker compose down
-            # git stash
+            git stash
             # Set git config
             git config --global credential.helper none
             git pull origin main
             sudo docker compose up --build -d
+            sudo npm run build
             sudo docker exec country_api npm run migration:run
             echo "Done"
