@@ -68,13 +68,11 @@ export class CountryService {
       coatOfArms: apiCountry.coatOfArms,
     }));
 
-    // Clear existing data
     await Promise.all([
       this.queryBuilder.clearCountries(),
       this.redisService.delete('countries'),
     ]);
 
-    // Save new data
     await Promise.all([
       this.queryBuilder.saveCountries(mappedCountries),
       this.redisService.set('countries', redisMappedCountries),
