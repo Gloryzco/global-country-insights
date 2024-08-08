@@ -356,7 +356,7 @@ export class CountryService {
       },
     };
 
-    await this.redisService.set(cacheKey, JSON.stringify(statisticsDto));
+    await this.redisService.set(cacheKey, statisticsDto);
 
     return statisticsDto;
   }
