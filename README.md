@@ -1,5 +1,7 @@
 # Country Insights API
 
+### API URL: http://3.82.15.33:3009/documentation
+
 ## Overview
 
 The Country Insights API is a comprehensive service designed to provide detailed information about countries around the world. This API includes functionalities for querying country data, managing cache, and performing various analytics based on country attributes. The implementation leverages NestJS for building a scalable REST API, TypeORM for database interaction, and Redis for caching.
@@ -72,6 +74,12 @@ npm run start
 
 ```bash
 npm run test
+```
+
+If you choose to use docker instead, you can do
+
+```bash
+docker-compose up --build
 ```
 
 # API Endpoints Documentation
