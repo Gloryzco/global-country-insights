@@ -30,8 +30,8 @@ export class AuthController {
     type: LoginUserResponseData,
   })
   @ApiBadRequestResponse({
-    description: 'User does not exist',
-    type: LoginUserResponseData,
+    status: 400,
+    description: 'Invalid username or password',
   })
   @Post('login')
   async login(@Response() res, @Body() loginDto: LoginDto) {
