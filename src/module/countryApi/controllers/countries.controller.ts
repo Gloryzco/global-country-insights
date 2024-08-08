@@ -135,7 +135,7 @@ export class CountriesController {
     return ResponseFormat.successResponse(
       res,
       languagesData,
-      'Country details fetched Successfully',
+      'Countries languages fetched Successfully',
       HttpStatus.OK,
     );
   }
@@ -166,7 +166,7 @@ export class CountriesController {
     return ResponseFormat.successResponse(
       res,
       statisticsData,
-      'Country details fetched Successfully',
+      'Countries statistics fetched Successfully',
       HttpStatus.OK,
     );
   }
