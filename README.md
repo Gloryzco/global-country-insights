@@ -257,8 +257,7 @@ docker-compose up --build
 
 - **Security and User Authentication:**
 
-  - **Security Measures:** Ensuring the security of our API was paramount. I implemented comprehensive security measures, including input validation, sanitization, and rate limiting. Protecting the API from common web vulnerabilities and ensuring it could only be accessed via HTTPS were essential steps in safeguarding our data and users.
-  - **HTTPS Enforcement:** Enforcing HTTPS was a critical decision to ensure secure communication and data protection.
+  - **Security Measures:** Ensuring the security of the API was paramount. I implemented comprehensive security measures, including input validation, sanitization, user authentication and rate limiting. Protecting the API from common web vulnerabilities and ensuring it could only be accessed by authenticated users.
 
 - **Documentation and Testing:**
 
@@ -267,19 +266,19 @@ docker-compose up --build
 
 - **Automated CI/CD Pipeline:**
   - **CI/CD Integration:** Implementing a continuous integration and continuous deployment (CI/CD) pipeline was a major highlight. Automating the build, test, and deployment processes ensured that code changes were thoroughly tested and deployed seamlessly. Setting up automated testing and deployment reduced manual errors and accelerated the release cycle, which was crucial for maintaining the quality and reliability of the API.
-  - **Automated Testing:** Incorporating automated testing into the CI/CD pipeline allowed for consistent validation of code changes. By integrating unit tests and integration tests, I ensured that new features and bug fixes were validated continuously, providing confidence in the stability of each release.
 
 ## Aspects I am Particularly Proud Of 💪😊
 
 - **Optimized Performance:** The performance improvements achieved through caching and query optimization were incredibly satisfying. Witnessing the API's enhanced speed and efficiency was a testament to the hard work put into these optimizations.
-- **Robust Security:** Implementing strong security measures and ensuring HTTPS enforcement were crucial. I’m proud of the fact that the API is well-protected against common threats and vulnerabilities.
-- **Efficient Data Management:** I effective handled of large datasets and concurrent requests demonstrated our ability to build scalable and reliable systems. It was rewarding to see the smooth operation under high load conditions.
+- **Robust Security:** I’m proud of the fact that the API is well-protected against common threats and vulnerabilities.
+- **Efficient Data Management:** I effective handled of large datasets and concurrent requests demonstrated our ability to build scalable and reliable systems. It was rewarding to see the smooth operation under high load conditions. Also frequent calls to the third party API was discouraged as the data was loaded into the db for subsequent use and more aggregated queries and relatioships can be achieved.
 
 ## Potential Improvements and Additional Features to improve the overall API 🤞
 
 - **Advanced Analytics:** If time allowed, I would love to explore more advanced analytics features. Detailed reporting and deeper insights could provide even greater value to our users and enhance the overall functionality of the API.
 - **Enhanced Caching Mechanisms:** I envision implementing more sophisticated caching strategies, such as cache invalidation and refreshing. These improvements would further optimize performance and ensure data accuracy.
-- **Permissions for admin users:** This will be to allow only admin users only to have access to the admin routes
+- **Permissions for admin users:** This will be to allow only admin users only to have access to the admin 
+- **HTTPs Enforceemnt: To further protect the api against vulnerablity, I would love to enforce the HTTPs as the only access into the API so as to ensure communication and data protection.
 - **Expanded Documentation and Testing:** I plan to continue enhancing our documentation and increasing test coverage to cover more edge cases and ensure comprehensive functionality. Also, I was unable to perfect the integration testing and it is one of the improvement I would like to look into if time permits me. This ongoing effort would ensure that our API remains reliable and user-friendly.
 
 Contributing
