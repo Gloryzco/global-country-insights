@@ -1,6 +1,4 @@
-# Country Insights API
-
-### API URL: http://3.82.15.33:3009/documentation
+# Country Insights
 
 ## Overview
 
